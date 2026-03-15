@@ -350,6 +350,13 @@ footer strong{color:var(--muted2)}
   <p><strong>⚠️ Cálculo orientativo.</strong> Tramos IRPF 2026 (estatal + autonómico aproximados). No incluye deducciones por hijos, hipoteca, discapacidad, planes de pensiones ni reducciones personales.</p>
   <p>SS empleado: 6,35% (CC 4,70% + Desempleo 1,55% + FP 0,10%). Base máx.: ~56.000€/año. Navarra y País Vasco tienen sistema foral propio y no se comparan.</p>
   <p style="margin-top:8px;opacity:.4">Solo orientativo. Consulta a un asesor fiscal para cálculos precisos.</p>
+  <div style="margin-top:24px; font-size: 13px; color: var(--muted2); display: flex; align-items: center; justify-content: center; gap: 16px;">
+    <span>Made with ❤️</span>
+    <a href="https://github.com/raulcarlomagno/irpf-bite" target="_blank" style="color: var(--muted2); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: color .18s;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+      github.com/raulcarlomagno/irpf-bite
+    </a>
+  </div>
 </div>
 </footer>
 
@@ -1020,13 +1027,13 @@ function initMainChart(){
     scales:{x:{type:'linear',min:0,max:300000,ticks:{color:'rgba(255,255,255,.2)',font:{size:10,family:"'DM Mono'"},callback:v=>v>=1000?(v/1000)+'k':v,maxTicksLimit:8},grid:{color:'rgba(255,255,255,.04)'}},
       y:{ticks:{color:'rgba(255,255,255,.2)',font:{size:10,family:"'DM Mono'"},callback:v=>(v/1000)+'k',maxTicksLimit:6},grid:{color:'rgba(255,255,255,.04)'}}}}});
 }
-function updateMainChart(){
+function updateMainChart(mode='none'){
   const pts=[];for(let g=0;g<=300000;g+=2000){const r=calcIRPF(g,cc);if(r)pts.push(r)}
   mainChart.data.datasets[0].data=pts.map(p=>({x:p.gross,y:p.gross}));
   mainChart.data.datasets[1].data=pts.map(p=>({x:p.gross,y:p.net}));
   const r=calcIRPF(salary,cc);
   mainChart.data.datasets[2].data=r?[{x:r.gross,y:r.net}]:[];
-  mainChart.update('none');
+  mainChart.update(mode);
 }
 
 function initDonutChart(){
@@ -1034,14 +1041,15 @@ function initDonutChart(){
   donutChart=new Chart(ctx,{type:'doughnut',data:{labels:['Neto (tuyo)','IRPF','Seg. Social'],
     datasets:[{data:[0,0,0],backgroundColor:['rgba(0,232,122,.7)','rgba(255,58,92,.7)','rgba(255,200,60,.55)'],borderColor:['#00e87a','#ff3a5c','#ffc83d'],borderWidth:2,hoverOffset:8}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
+      layout:{padding:15},
       interaction:{intersect:false},
       plugins:{legend:{position:'bottom',labels:{color:'rgba(255,255,255,.45)',font:{size:11,family:"'DM Mono'"},padding:12,boxWidth:12}},
         tooltip:{backgroundColor:'#0d1024',borderColor:'rgba(255,200,60,.2)',borderWidth:1,padding:12,
           callbacks:{label:i=>`  ${i.label}: ${fmt(i.parsed)} (${pct(i.parsed/i.dataset.data.reduce((a,b)=>a+b,0))})`}}}}});
 }
-function updateDonutChart(){
+function updateDonutChart(mode='none'){
   const r=calcIRPF(salary,cc);if(!r)return;
-  donutChart.data.datasets[0].data=[r.net,r.irpf,r.ss];donutChart.update('none');
+  donutChart.data.datasets[0].data=[r.net,r.irpf,r.ss];donutChart.update(mode);
 }
 
 function initMarginalChart(){
@@ -1059,12 +1067,12 @@ function initMarginalChart(){
     scales:{x:{type:'linear',min:0,max:300000,ticks:{color:'rgba(255,255,255,.2)',font:{size:10,family:"'DM Mono'"},callback:v=>v>=1000?(v/1000)+'k':v,maxTicksLimit:8},grid:{color:'rgba(255,255,255,.04)'}},
       y:{min:0,max:100,ticks:{color:'rgba(255,255,255,.2)',font:{size:10,family:"'DM Mono'"},callback:v=>v+'€',maxTicksLimit:6},grid:{color:'rgba(255,255,255,.04)'}}}}});
 }
-function updateMarginalChart(){
+function updateMarginalChart(mode='none'){
   const pts=[];for(let g=0;g<=300000;g+=2000){const mk=margKeep(g,cc);if(mk!==null)pts.push({x:g,y:mk*100})}
   marginalChart.data.datasets[0].data=pts;
   const mk=margKeep(salary,cc);
   marginalChart.data.datasets[2].data=mk!==null?[{x:salary,y:mk*100}]:[];
-  marginalChart.update('none');
+  marginalChart.update(mode);
 }
 
 function initEffectiveChart(){
@@ -1081,12 +1089,12 @@ function initEffectiveChart(){
     scales:{x:{type:'linear',min:0,max:300000,ticks:{color:'rgba(255,255,255,.2)',font:{size:10,family:"'DM Mono'"},callback:v=>v>=1000?(v/1000)+'k':v,maxTicksLimit:8},grid:{color:'rgba(255,255,255,.04)'}},
       y:{min:0,ticks:{color:'rgba(255,255,255,.2)',font:{size:10,family:"'DM Mono'"},callback:v=>v+'%',maxTicksLimit:6},grid:{color:'rgba(255,255,255,.04)'}}}}});
 }
-function updateEffectiveChart(){
+function updateEffectiveChart(mode='none'){
   const pts=[];for(let g=0;g<=300000;g+=2000){const r=calcIRPF(g,cc);if(r)pts.push({x:g,y:r.effIRPF*100})}
   effectiveChart.data.datasets[0].data=pts;
   const r=calcIRPF(salary,cc);
   effectiveChart.data.datasets[1].data=r?[{x:r.gross,y:r.effIRPF*100}]:[];
-  effectiveChart.update('none');
+  effectiveChart.update(mode);
 }
 
 function initRankingChart(){
@@ -1100,7 +1108,7 @@ function initRankingChart(){
       scales:{x:{ticks:{color:'rgba(255,255,255,.2)',font:{size:10,family:"'DM Mono'"},callback:v=>(v/1000)+'k€',maxTicksLimit:6},grid:{color:'rgba(255,255,255,.04)'}},
         y:{ticks:{color:'rgba(255,255,255,.6)',font:{size:11,family:"'DM Sans'"}},grid:{display:false}}}}});
 }
-function updateRankingChart(){
+function updateRankingChart(mode='none'){
   const all=COMMUNITIES.filter(c=>!c.foral).map(c=>({c,...calcIRPF(salary,c)})).sort((a,b)=>b.net-a.net);
   const nets=all.map(x=>x.net),minN=Math.min(...nets),maxN=Math.max(...nets);
   rankingChart.data.labels=all.map(x=>x.c.emoji+' '+x.c.name);
@@ -1111,7 +1119,7 @@ function updateRankingChart(){
     const t=(x.net-minN)/(maxN-minN||1);
     return lerp(t);
   });
-  rankingChart.update('none');
+  rankingChart.update(mode);
   document.getElementById('rankingSubtitle').textContent=`Para ${fmt(salary)} brutos/año · Neto anual de mayor a menor`;
 }
 
@@ -1128,16 +1136,16 @@ function syncSlider(){
 
 // ══════════════ MASTER UPDATE ══════════════
 
-function updateAll(){
+function updateAll(mode='none'){
   updateStats();
   colorizeMap();
   updateRankPanel();
   updateCompareTrio();
-  updateMainChart();
-  updateDonutChart();
-  updateMarginalChart();
-  updateEffectiveChart();
-  updateRankingChart();
+  updateMainChart(mode);
+  updateDonutChart(mode);
+  updateMarginalChart(mode);
+  updateEffectiveChart(mode);
+  updateRankingChart(mode);
   updateBreakdown();
 }
 
@@ -1156,7 +1164,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   initEffectiveChart();
   initRankingChart();
   syncSlider();
-  updateAll();
+  setTimeout(()=>updateAll('default'),100);
 
   document.getElementById('salarySlider').addEventListener('input',()=>{syncSlider();updateAll()});
   document.querySelectorAll('.preset-btn').forEach(b=>b.addEventListener('click',()=>{
