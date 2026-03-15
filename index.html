@@ -1636,8 +1636,19 @@
       }
 
       function addPoint() {
+        // Longitude remains linear (Web Mercator is linear in longitude)
         const lon = SVG_GEO_BOUNDS.west + (x / SVG_WIDTH) * (SVG_GEO_BOUNDS.east - SVG_GEO_BOUNDS.west);
-        const lat = SVG_GEO_BOUNDS.north - (y / SVG_HEIGHT) * (SVG_GEO_BOUNDS.north - SVG_GEO_BOUNDS.south);
+
+        // Latitude calculation revised for Mercator projection (Web Mercator / EPSG:3857)
+        // This prevents the "southern shift" distortion in Spain's mapping.
+        const project = lat => Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI / 180) / 2));
+        const unproject = yMerc => (2 * Math.atan(Math.exp(yMerc)) - Math.PI / 2) * 180 / Math.PI;
+
+        const yMercNorth = project(SVG_GEO_BOUNDS.north);
+        const yMercSouth = project(SVG_GEO_BOUNDS.south);
+        const yMercCurrent = yMercNorth - (y / SVG_HEIGHT) * (yMercNorth - yMercSouth);
+
+        const lat = unproject(yMercCurrent);
         currentContour.push([lat, lon]);
       }
 
@@ -1742,8 +1753,7 @@
       const northEast = [SVG_GEO_BOUNDS.north, SVG_GEO_BOUNDS.east];
       const bounds = L.latLngBounds(southWest, northEast);
 
-      // Add SVG as background image
-      L.imageOverlay('spain.svg', bounds).addTo(spainMap);
+      // Removed L.imageOverlay to allow seeing the map tiles behind the polygons
 
       // Set zoom and center manually instead of using fitBounds
       spainMap.setZoom(6);
@@ -1792,7 +1802,7 @@
               weight: 2,
               opacity: 1,
               color: '#ffffff',
-              fillOpacity: 0.5
+              fillOpacity: 0.75
             });
 
             // Add to layer with metadata
@@ -1857,7 +1867,7 @@
           fillColor: fill,
           weight: isSelected ? 2 : 1,
           color: isSelected ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.15)',
-          fillOpacity: 0.7,
+          fillOpacity: 0.6,
           opacity: 0.5
         });
       });
