@@ -571,9 +571,9 @@ const REGION_CODES = {
 // Format appears to be: minLon, maxLat, maxLon, minLat (west, north, east, south)
 const SVG_GEO_BOUNDS = {
   west: -18.161674,
-  south: 27.4,
+  south: 27.636889,
   east: 4.332045,
-  north: 44.0
+  north: 43.794381
 };
 const SVG_WIDTH = 612.91315;
 const SVG_HEIGHT = 543.61902;
@@ -587,91 +587,101 @@ function latLonToSvgPixel(lat, lon) {
 
 // Convert SVG path to Leaflet lat/lon polygon
 function svgPathToLatLng(pathD) {
-  // Parse SVG path commands - simplified for 'm' and 'l' commands
-  const coords = [];
-  const regex = /([ml])\s*([-\d.]+),([-\d.]+)/g;
-  let match;
-  while ((match = regex.exec(pathD)) !== null) {
-    const px = parseFloat(match[2]);
-    const py = parseFloat(match[3]);
-    // Convert pixel to lat/lon
-    const lon = SVG_GEO_BOUNDS.west + (px / SVG_WIDTH) * (SVG_GEO_BOUNDS.east - SVG_GEO_BOUNDS.west);
-    const lat = SVG_GEO_BOUNDS.north - (py / SVG_HEIGHT) * (SVG_GEO_BOUNDS.north - SVG_GEO_BOUNDS.south);
-    coords.push([lat, lon]);
-  }
-  return coords;
+  const contours = parseSvgPath(pathD);
+  // Leaflet L.polygon accepts both [[lat,lon],...] and [[[lat,lon],...],...]
+  return contours;
 }
 
-// Parse SVG path with proper handling of relative commands
+// Parse SVG path with proper handling of sub-contours and relative commands
 function parseSvgPath(pathD) {
-  const coords = [];
-  let x = 0, y = 0;
-  let firstX = 0, firstY = 0;
-  let hasValidCoords = false;
+  const allContours = [];
+  let currentContour = [];
+  let x = 0;
+  let y = 0;
+  let startX = 0;
+  let startY = 0;
   
-  // Split path into commands
+  // Robust command splitter
   const commands = pathD.match(/[a-zA-Z][^a-zA-Z]*/g) || [];
   
   for (const cmd of commands) {
     const type = cmd[0];
-    const args = cmd.slice(1).trim().split(/[\s,]+/).filter(s => s).map(Number);
+    const args = cmd.slice(1).trim()
+                    .replace(/-/g, ' -')
+                    .split(/[\s,]+/)
+                    .filter(s => s.length > 0)
+                    .map(Number);
     
-    for (let i = 0; i < args.length; i += 2) {
-      const dx = args[i];
-      const dy = args[i + 1];
-      
-      if (isNaN(dx) || isNaN(dy)) continue;
-      
-      switch (type) {
-        case 'm': // relative move
-          x += dx;
-          y += dy;
-          if (coords.length === 0) {
-            firstX = x;
-            firstY = y;
-          }
-          break;
-        case 'l': // relative line
-          x += dx;
-          y += dy;
-          break;
-        case 'M': // absolute move
-          x = dx;
-          y = dy;
-          if (coords.length === 0) {
-            firstX = x;
-            firstY = y;
-          }
-          break;
-        case 'L': // absolute line
-          x = dx;
-          y = dy;
-          break;
-        case 'z': // close path
-          x = firstX;
-          y = firstY;
-          break;
-        default:
-          // Skip other commands for now
-          continue;
+    const lowerType = type.toLowerCase();
+    
+    // Commands that take a single coordinate (or multiple single coordinates)
+    if (lowerType === 'h' || lowerType === 'v') {
+      for (let i = 0; i < args.length; i++) {
+        const val = args[i];
+        if (lowerType === 'h') {
+          x = (type === 'h') ? x + val : val;
+        } else {
+          y = (type === 'v') ? y + val : val;
+        }
+        addPoint();
       }
-      
-      // Skip invalid coordinates (outside SVG bounds)
-      if (x < 0 || x > SVG_WIDTH || y < 0 || y > SVG_HEIGHT) continue;
-      
-      // Convert pixel to lat/lon
-      const lon = SVG_GEO_BOUNDS.west + (x / SVG_WIDTH) * (SVG_GEO_BOUNDS.east - SVG_GEO_BOUNDS.west);
-      const lat = SVG_GEO_BOUNDS.north - (y / SVG_HEIGHT) * (SVG_GEO_BOUNDS.north - SVG_GEO_BOUNDS.south);
-      
-      // Skip invalid lat/lon
-      if (lon < -180 || lon > 180 || lat < -90 || lat > 90) continue;
-      
-      hasValidCoords = true;
-      coords.push([lat, lon]);
+    } 
+    // Commands that take coordinate pairs
+    else if (lowerType === 'm' || lowerType === 'l') {
+      for (let i = 0; i < args.length; i += 2) {
+        if (i + 1 >= args.length) break;
+        const dx = args[i];
+        const dy = args[i+1];
+
+        if (lowerType === 'm' && i === 0) {
+          // New sub-contour
+          if (currentContour.length > 0) {
+            allContours.push(currentContour);
+          }
+          currentContour = [];
+          if (type === 'm') {
+            x += dx; y += dy;
+          } else {
+            x = dx; y = dy;
+          }
+          startX = x;
+          startY = y;
+        } else {
+          // Lines (implicit after M/m or explicit l/L)
+          if (type === 'm' || type === 'l') {
+            x += dx; y += dy;
+          } else {
+            x = dx; y = dy;
+          }
+        }
+        addPoint();
+      }
+    }
+    // Close path
+    else if (lowerType === 'z') {
+      x = startX;
+      y = startY;
+      // Many SVG polygons don't repeat the start point at the end, 
+      // but Leaflet likes it or handles it. We don't strictly need to add it here
+      // as Leaflet's L.polygon closes automatically.
+      if (currentContour.length > 0) {
+        allContours.push(currentContour);
+        currentContour = [];
+      }
     }
   }
+
+  function addPoint() {
+    const lon = SVG_GEO_BOUNDS.west + (x / SVG_WIDTH) * (SVG_GEO_BOUNDS.east - SVG_GEO_BOUNDS.west);
+    const lat = SVG_GEO_BOUNDS.north - (y / SVG_HEIGHT) * (SVG_GEO_BOUNDS.north - SVG_GEO_BOUNDS.south);
+    currentContour.push([lat, lon]);
+  }
   
-  return hasValidCoords ? coords : [];
+  if (currentContour.length > 0) {
+    allContours.push(currentContour);
+  }
+  
+  return allContours;
 }
 
 // Convert SVG pixel coordinates to Leaflet's simple CRS coordinates
@@ -802,16 +812,17 @@ function buildMap() {
         const community = REGION_CODES[regionId];
         
         // Convert SVG pixel coordinates to lat/lon using geoViewBox bounds
-        const coords = parseSvgPath(pathD);
+        const allContours = parseSvgPath(pathD);
         
-        console.log('Coords for', regionId, ':', coords.length, 'points');
+        // Check total points across all contours
+        const totalPoints = allContours.reduce((acc, c) => acc + c.length, 0);
         
-        if (coords.length < 3) {
+        if (totalPoints < 3) {
           console.log('Skipping - not enough coords for:', regionId);
           return;
         }
         
-        const polygon = L.polygon(coords, {
+        const polygon = L.polygon(allContours, {
           fillColor: community.foral ? 'rgba(255,255,255,0.05)' : '#ff0000',
           weight: 2,
           opacity: 1,
