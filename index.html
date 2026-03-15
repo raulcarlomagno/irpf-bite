@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>¿Cuánto te queda de verdad? — IRPF España 2024</title>
+<title>¿Cuánto te queda de verdad? — IRPF España 2026</title>
 <meta name="description" content="La calculadora que nadie te explica. Descubre cuánto IRPF pagas realmente y compara entre comunidades autónomas.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -187,7 +187,7 @@ footer strong{color:var(--muted2)}
 <header class="hero fade-up">
 <div class="wrap">
   <div class="hero__glow"></div>
-  <div class="hero__tag">💰 <span>IRPF España · Datos 2024</span></div>
+  <div class="hero__tag">💰 <span>IRPF España · Datos 2026</span></div>
   <h1 class="hero__title">¿Cuánto te queda<br><em>de verdad?</em></h1>
   <p class="hero__sub">La calculadora que nadie te explica. Bruto → Neto real. IRPF + Seguridad Social. Compara las 15 comunidades de régimen común.</p>
 </div>
@@ -343,14 +343,14 @@ footer strong{color:var(--muted2)}
 
 <footer>
 <div class="wrap">
-  <p><strong>⚠️ Cálculo orientativo.</strong> Tramos IRPF 2024 (estatal + autonómico aproximados). No incluye deducciones por hijos, hipoteca, discapacidad, planes de pensiones ni reducciones personales.</p>
+  <p><strong>⚠️ Cálculo orientativo.</strong> Tramos IRPF 2026 (estatal + autonómico aproximados). No incluye deducciones por hijos, hipoteca, discapacidad, planes de pensiones ni reducciones personales.</p>
   <p>SS empleado: 6,35% (CC 4,70% + Desempleo 1,55% + FP 0,10%). Base máx.: ~56.000€/año. Navarra y País Vasco tienen sistema foral propio y no se comparan.</p>
   <p style="margin-top:8px;opacity:.4">Solo orientativo. Consulta a un asesor fiscal para cálculos precisos.</p>
 </div>
 </footer>
 
 <script>
-// ══════════════ FISCAL DATA 2024 ══════════════
+// ══════════════ FISCAL DATA 2026 ══════════════
 
 const STATE_BR = [
   [0,12450,.095],[12450,20200,.12],[20200,35200,.15],
@@ -360,35 +360,35 @@ const PERSONAL_MIN=5550, SS_RATE=.0635, SS_MAX=56000, OTHER_D=2000;
 
 const COMMUNITIES=[
   {id:'madrid',name:'Madrid',emoji:'🏛️',mapId:'CM',
-    brackets:[[0,12450,.085],[12450,17707,.107],[17707,33007,.129],[33007,53407,.179],[53407,Infinity,.210]]},
+    brackets:[[0,13362,.085],[13362,19004,.107],[19004,35425,.128],[35425,57320,.174],[57320,Infinity,.205]]},
   {id:'andalucia',name:'Andalucía',emoji:'🌞',mapId:'AN',
-    brackets:[[0,12450,.090],[12450,20200,.112],[20200,35200,.140],[35200,60000,.175],[60000,Infinity,.205]]},
+    brackets:[[0,13000,.095],[13000,21000,.12],[21000,35200,.15],[35200,50000,.185],[50000,Infinity,.225]]},
   {id:'larioja',name:'La Rioja',emoji:'🍇',mapId:'RI',
-    brackets:[[0,12450,.090],[12450,20200,.115],[20200,35200,.140],[35200,60000,.180],[60000,Infinity,.210]]},
+    brackets:[[0,12450,.08],[12450,20200,.106],[20200,35200,.136],[35200,40000,.178],[40000,50000,.185],[50000,60000,.19],[60000,120000,.245],[120000,Infinity,.27]]},
   {id:'canarias',name:'Canarias',emoji:'🌋',mapId:'CN',
-    brackets:[[0,12450,.090],[12450,20200,.115],[20200,35200,.140],[35200,60000,.185],[60000,Infinity,.225]]},
+    brackets:[[0,12450,.09],[12450,17707,.115],[17707,33007,.14],[33007,53407,.185],[53407,90000,.235],[90000,120000,.25],[120000,Infinity,.26]]},
   {id:'castillaleon',name:'Castilla y León',emoji:'🏰',mapId:'CL',
-    brackets:[[0,12450,.094],[12450,20200,.120],[20200,35200,.140],[35200,53407,.185],[53407,Infinity,.215]]},
+    brackets:[[0,12450,.09],[12450,20200,.12],[20200,35200,.14],[35200,53407,.185],[53407,Infinity,.215]]},
   {id:'murcia',name:'Murcia',emoji:'🌶️',mapId:'MU',
-    brackets:[[0,12450,.094],[12450,20200,.120],[20200,35200,.145],[35200,60000,.185],[60000,Infinity,.225]]},
+    brackets:[[0,12450,.095],[12450,20200,.112],[20200,34000,.133],[34000,60000,.179],[60000,Infinity,.225]]},
   {id:'galicia',name:'Galicia',emoji:'🌊',mapId:'GA',
-    brackets:[[0,12450,.094],[12450,20200,.120],[20200,35200,.145],[35200,60000,.185],[60000,80000,.225],[80000,Infinity,.235]]},
+    brackets:[[0,12985,.09],[12985,21068,.1165],[21068,35200,.149],[35200,47600,.184],[60000,Infinity,.225]]},
   {id:'castillamancha',name:'Castilla-La Mancha',emoji:'🌾',mapId:'MC',
-    brackets:[[0,12450,.095],[12450,20200,.120],[20200,35200,.145],[35200,60000,.185],[60000,Infinity,.225]]},
+    brackets:[[0,12450,.095],[12450,20200,.12],[20200,35200,.15],[35200,60000,.185],[60000,Infinity,.225]]},
   {id:'cantabria',name:'Cantabria',emoji:'🌿',mapId:'CB',
-    brackets:[[0,12450,.095],[12450,20200,.120],[20200,35200,.148],[35200,60000,.185],[60000,90000,.225],[90000,Infinity,.245]]},
+    brackets:[[0,13000,.085],[13000,21000,.11],[21000,35200,.145],[35200,60000,.18],[60000,90000,.225],[90000,Infinity,.245]]},
   {id:'aragon',name:'Aragón',emoji:'🏞️',mapId:'AR',
-    brackets:[[0,12450,.100],[12450,20200,.125],[20200,35200,.155],[35200,60000,.190],[60000,150000,.235],[150000,300000,.250],[300000,Infinity,.255]]},
+    brackets:[[0,13972.5,.095],[13972.5,21210,.12],[21210,36960,.15],[36960,52500,.185],[52500,60000,.205],[60000,80000,.23],[80000,90000,.24],[90000,130000,.25],[130000,Infinity,.255]]},
   {id:'baleares',name:'Baleares',emoji:'🏝️',mapId:'IB',
-    brackets:[[0,10000,.095],[10000,18000,.120],[18000,30000,.145],[30000,48000,.185],[48000,70000,.225],[70000,Infinity,.245]]},
+    brackets:[[0,10000,.09],[10000,18000,.1125],[18000,30000,.1425],[30000,48000,.175],[48000,70000,.19],[70000,90000,.2175],[90000,120000,.2275],[120000,175000,.2375],[175000,Infinity,.2475]]},
   {id:'asturias',name:'Asturias',emoji:'⛰️',mapId:'AS',
-    brackets:[[0,12450,.100],[12450,17707,.120],[17707,33007,.140],[33007,53407,.185],[53407,70000,.215],[70000,90000,.235],[90000,175000,.245],[175000,Infinity,.255]]},
+    brackets:[[0,12450,.10],[12450,17707,.12],[17707,33007,.14],[33007,53407,.185],[53407,70000,.215],[70000,90000,.225],[90000,175000,.25],[175000,Infinity,.255]]},
   {id:'valencia',name:'C. Valenciana',emoji:'🍊',mapId:'VC',
-    brackets:[[0,12450,.099],[12450,20200,.120],[20200,35200,.148],[35200,60000,.185],[60000,80000,.225],[80000,120000,.245],[120000,175000,.249],[175000,Infinity,.254]]},
+    brackets:[[0,12000,.09],[12000,22000,.12],[22000,32000,.15],[32000,42000,.175],[42000,52000,.20],[52000,65000,.225],[62000,72000,.25],[72000,100000,.265],[100000,150000,.275],[150000,200000,.285],[200000,Infinity,.295]]},
   {id:'cataluna',name:'Cataluña',emoji:'🏔️',mapId:'CT',
-    brackets:[[0,12450,.105],[12450,17707,.120],[17707,21000,.140],[21000,33007,.150],[33007,53407,.188],[53407,90000,.215],[90000,120000,.235],[120000,175000,.245],[175000,Infinity,.255]]},
+    brackets:[[0,12450,.105],[12450,17707,.12],[17707,21000,.14],[21000,33007,.15],[33007,53407,.188],[53407,90000,.215],[90000,120000,.235],[120000,175000,.245],[175000,Infinity,.255]]},
   {id:'extremadura',name:'Extremadura',emoji:'🌿',mapId:'EX',
-    brackets:[[0,12450,.100],[12450,20200,.125],[20200,35200,.155],[35200,60000,.195],[60000,80000,.235],[80000,Infinity,.255]]},
+    brackets:[[0,12450,.08],[12450,20200,.10],[20200,24200,.16],[24200,35200,.175],[35200,60000,.21],[60000,80200,.235],[80200,99220,.24],[99220,120200,.245],[120200,Infinity,.25]]},
   {id:'navarra',name:'Navarra',emoji:'⚠️',mapId:'NC',foral:true,brackets:[]},
   {id:'paisvasco',name:'País Vasco',emoji:'⚠️',mapId:'PV',foral:true,brackets:[]},
 ];
