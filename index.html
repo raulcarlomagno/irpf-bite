@@ -7,7 +7,9 @@
 <meta name="description" content="La calculadora que nadie te explica. Descubre cuánto IRPF pagas realmente y compara entre comunidades autónomas.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -118,10 +120,12 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border:none;border-ra
 .map-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px;position:relative}
 .map-card__title{font-family:var(--font-d);font-size:15px;font-weight:700;margin-bottom:3px}
 .map-card__sub{font-size:11px;color:var(--muted);margin-bottom:14px}
-#spainMapSvg{width:100%;height:auto;display:block}
-#spainMapSvg g{cursor:pointer}
-#spainMapSvg g path{transition:opacity .15s,filter .15s}
-#spainMapSvg g:hover path{opacity:.82;filter:brightness(1.25)}
+#spainMap{height:450px;width:100%;border-radius:12px;overflow:hidden;background:var(--bg1)}
+.leaflet-container{background:var(--bg1);font-family:var(--font-b)}
+.leaflet-control-zoom a{background:var(--bg2)!important;color:var(--text)!important;border-color:var(--border)!important}
+.leaflet-control-zoom a:hover{background:var(--bg3)!important}
+.leaflet-control-attribution{background:rgba(4,6,16,.8)!important;color:var(--muted)!important;font-size:9px}
+.leaflet-control-attribution a{color:var(--muted2)!important}
 .map-legend{display:flex;align-items:center;gap:8px;margin-top:10px;justify-content:center}
 .map-legend-bar{width:140px;height:8px;border-radius:4px;background:linear-gradient(to right,#ff3a5c,#ff9d00,#00e87a)}
 .map-legend-txt{font-family:var(--font-m);font-size:10px;color:var(--muted)}
@@ -276,7 +280,7 @@ footer strong{color:var(--muted2)}
     <div class="map-card">
       <div class="map-card__title">¿Dónde te queda más dinero?</div>
       <div class="map-card__sub">Verde = más neto · Rojo = menos neto · Haz clic para seleccionar comunidad</div>
-      <svg id="spainMapSvg" viewBox="0 0 900 680" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div id="spainMap"></div>
       <div class="map-legend">
         <span class="map-legend-txt">Menos neto</span>
         <div class="map-legend-bar"></div>
@@ -392,28 +396,6 @@ const COMMUNITIES=[
   {id:'navarra',name:'Navarra',emoji:'⚠️',mapId:'NC',foral:true,brackets:[]},
   {id:'paisvasco',name:'País Vasco',emoji:'⚠️',mapId:'PV',foral:true,brackets:[]},
 ];
-
-// SVG map paths — simplified geographic shapes for Spain communities (viewBox 0 0 900 680)
-const MAP_PATHS = {
-  GA:'M 65 95 L 130 88 L 155 108 L 158 135 L 145 162 L 118 172 L 88 165 L 62 140 L 58 115 Z',
-  AS:'M 162 82 L 240 72 L 278 82 L 283 104 L 265 124 L 230 132 L 192 128 L 162 118 L 158 98 Z',
-  CB:'M 283 72 L 328 66 L 344 82 L 338 108 L 315 118 L 286 115 L 278 98 Z',
-  PV:'M 348 62 L 400 55 L 418 72 L 412 95 L 385 106 L 352 100 L 342 80 Z',
-  NC:'M 418 52 L 472 46 L 484 72 L 474 100 L 448 112 L 418 106 L 406 82 Z',
-  AR:'M 478 48 L 564 44 L 586 78 L 590 145 L 572 195 L 528 210 L 476 205 L 454 172 L 448 118 L 458 75 Z',
-  CT:'M 568 44 L 670 38 L 696 66 L 690 100 L 668 135 L 616 155 L 576 150 L 556 125 L 560 80 Z',
-  IB:'M 678 198 L 740 188 L 765 208 L 760 236 L 728 250 L 690 240 L 672 218 Z',
-  RI:'M 400 100 L 452 94 L 468 120 L 458 142 L 430 148 L 402 136 L 390 116 Z',
-  CL:'M 88 178 L 248 162 L 330 168 L 400 162 L 446 178 L 460 240 L 434 292 L 368 308 L 288 312 L 208 296 L 138 272 L 96 244 L 86 208 Z',
-  MC:'M 258 240 L 372 228 L 432 255 L 450 308 L 424 360 L 375 396 L 312 400 L 255 382 L 215 342 L 212 288 Z',
-  VC:'M 568 210 L 620 210 L 645 232 L 650 288 L 634 345 L 606 386 L 578 400 L 552 382 L 536 340 L 540 275 L 552 228 Z',
-  MU:'M 524 372 L 590 356 L 632 372 L 636 410 L 614 442 L 568 448 L 530 426 L 514 398 Z',
-  AN:'M 100 394 L 196 378 L 290 382 L 390 376 L 462 386 L 522 384 L 550 406 L 548 444 L 514 476 L 448 496 L 360 504 L 276 500 L 196 476 L 128 450 L 96 418 Z',
-  EX:'M 92 272 L 204 260 L 258 282 L 272 332 L 256 380 L 196 392 L 126 386 L 90 358 L 80 314 Z',
-  CN:'M 50 570 L 148 558 L 174 578 L 168 606 L 140 620 L 72 622 L 44 600 Z M 232 588 L 298 580 L 324 598 L 318 624 L 284 636 L 238 630 L 218 610 Z',
-  NC_label:'M 418 52 L 472 46 L 484 72 L 474 100 L 448 112 L 418 106 L 406 82 Z',
-  PV_label:'M 348 62 L 400 55 L 418 72 L 412 95 L 385 106 L 352 100 L 342 80 Z',
-};
 
 // ══════════════ CALCULATION ══════════════
 
@@ -550,87 +532,373 @@ function shareTwitter(){window.open('https://twitter.com/intent/tweet?text='+enc
 function copyText(){navigator.clipboard?.writeText(viralText()).then(()=>alert('✅ Texto copiado'))}
 function shareUrl(){const u=location.href.split('?')[0]+`?bruto=${salary}&cc=${cc.id}`;navigator.clipboard?.writeText(u).then(()=>alert('🔗 URL copiada'));return u;}
 
-// ══════════════ SVG MAP ══════════════
+// ══════════════ LEAFLET MAP ══════════════
 
-function buildMap(){
-  const svg=document.getElementById('spainMapSvg');svg.innerHTML='';
-  COMMUNITIES.forEach(c=>{
-    const d=MAP_PATHS[c.mapId];if(!d)return;
-    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
-    g.setAttribute('data-id',c.id);
-    // handle multi-path (Canarias has 2 islands)
-    const parts=d.split(/ *M /).filter(Boolean).map((s,i)=>i===0?s:'M '+s);
-    parts.forEach(pd=>{
-      const p=document.createElementNS('http://www.w3.org/2000/svg','path');
-      p.setAttribute('d',pd.startsWith('M')?pd:'M '+pd);
-      p.setAttribute('stroke','rgba(4,6,16,0.8)');
-      p.setAttribute('stroke-width','1.5');
-      p.setAttribute('stroke-linejoin','round');
-      p.setAttribute('fill',c.foral?'rgba(255,255,255,0.05)':'rgba(255,255,255,0.1)');
-      g.appendChild(p);
-    });
-    // Add label
-    const bbox=getBboxApprox(c.mapId);
-    if(bbox&&!c.foral){
-      const t=document.createElementNS('http://www.w3.org/2000/svg','text');
-      t.setAttribute('x',bbox.cx);t.setAttribute('y',bbox.cy);
-      t.setAttribute('text-anchor','middle');t.setAttribute('dominant-baseline','middle');
-      t.setAttribute('fill','rgba(255,255,255,0.0)');
-      t.setAttribute('font-size','10');t.setAttribute('font-family','DM Mono,monospace');
-      t.setAttribute('pointer-events','none');
-      t.textContent=c.id==='castillaleon'?'CyL':c.id==='castillamancha'?'CLM':c.id==='extremadura'?'EXT':c.mapId;
-      g.appendChild(t);
-    }
-    if(!c.foral){
-      g.style.cursor='pointer';
-      g.addEventListener('click',()=>{cc=c;renderPills();updateAll()});
-      g.addEventListener('mouseenter',e=>showMapTip(e,c));
-      g.addEventListener('mouseleave',()=>{document.getElementById('mapTooltip').style.display='none'});
-    }
-    svg.appendChild(g);
-  });
-}
+let spainMap, geoJsonLayer;
 
-const BBOX={
-  GA:{cx:112,cy:130},AS:{cx:222,cy:102},CB:{cx:311,cy:92},
-  PV:{cx:381,cy:80},NC:{cx:445,cy:80},AR:{cx:522,cy:127},
-  CT:{cx:622,cy:96},IB:{cx:718,cy:219},RI:{cx:430,cy:122},
-  CL:{cx:273,cy:237},MC:{cx:330,cy:315},VC:{cx:589,cy:300},
-  MU:{cx:574,cy:406},AN:{cx:325,cy:440},EX:{cx:176,cy:330},
-  CN:{cx:180,cy:590},
+// Map region codes to community IDs (SVG IDs: ES-AN, ES-AR, etc.)
+const REGION_CODES = {
+  'ES-AN': { id: 'andalucia', name: 'Andalucía', emoji: '🌞' },
+  'ES-AR': { id: 'aragon', name: 'Aragón', emoji: '🏞️' },
+  'ES-AS': { id: 'asturias', name: 'Asturias', emoji: '⛰️' },
+  'ES-CB': { id: 'cantabria', name: 'Cantabria', emoji: '🌿' },
+  'ES-CM': { id: 'castillamancha', name: 'Castilla-La Mancha', emoji: '🌾' },
+  'ES-CL': { id: 'castillaleon', name: 'Castilla y León', emoji: '🏰' },
+  'ES-CT': { id: 'cataluna', name: 'Cataluña', emoji: '🏔️' },
+  'ES-EX': { id: 'extremadura', name: 'Extremadura', emoji: '🌿' },
+  'ES-GA': { id: 'galicia', name: 'Galicia', emoji: '🌊' },
+  'ES-IB': { id: 'baleares', name: 'Baleares', emoji: '🏝️' },
+  'ES-CN': { id: 'canarias', name: 'Canarias', emoji: '🌋' },
+  'ES-RI': { id: 'larioja', name: 'La Rioja', emoji: '🍇' },
+  'ES-MD': { id: 'madrid', name: 'Madrid', emoji: '🏛️' },
+  'ES-MC': { id: 'murcia', name: 'Murcia', emoji: '🌶️' },
+  'ES-NC': { id: 'navarra', name: 'Navarra', emoji: '⚠️', foral: true },
+  'ES-PV': { id: 'paisvasco', name: 'País Vasco', emoji: '⚠️', foral: true },
+  'ES-VC': { id: 'valencia', name: 'C. Valenciana', emoji: '🍊' }
 };
-function getBboxApprox(mapId){return BBOX[mapId]||null}
 
-function colorizeMap(){
-  const all=COMMUNITIES.filter(c=>!c.foral).map(c=>({c,r:calcIRPF(salary,c)}));
-  const nets=all.map(x=>x.r.net),minN=Math.min(...nets),maxN=Math.max(...nets);
-  all.forEach(({c,r})=>{
-    const t=(r.net-minN)/(maxN-minN||1);
-    const fill=lerp(t);
-    const stroke=c.id===cc.id?'rgba(255,255,255,0.9)':'rgba(4,6,16,0.8)';
-    const sw=c.id===cc.id?'2.5':'1.5';
-    const g=document.querySelector(`#spainMapSvg g[data-id="${c.id}"]`);
-    if(!g)return;
-    g.querySelectorAll('path').forEach(p=>{p.setAttribute('fill',fill);p.setAttribute('stroke',stroke);p.setAttribute('stroke-width',sw)});
+// ══════════════ SVG MAP (using spain.svg) ══════════════
+
+// SVG bounding box from spain.svg
+// Original: mapsvg:geoViewBox="-18.161674 43.794381 4.332045 27.636889"
+// Format appears to be: minLon, maxLat, maxLon, minLat (west, north, east, south)
+const SVG_GEO_BOUNDS = {
+  west: -18.161674,
+  south: 27.4,
+  east: 4.332045,
+  north: 44.0
+};
+const SVG_WIDTH = 612.91315;
+const SVG_HEIGHT = 543.61902;
+
+// Convert lat/lon to SVG pixel coordinates
+function latLonToSvgPixel(lat, lon) {
+  const x = ((lon - SVG_GEO_BOUNDS.west) / (SVG_GEO_BOUNDS.east - SVG_GEO_BOUNDS.west)) * SVG_WIDTH;
+  const y = ((SVG_GEO_BOUNDS.north - lat) / (SVG_GEO_BOUNDS.north - SVG_GEO_BOUNDS.south)) * SVG_HEIGHT;
+  return { x, y };
+}
+
+// Convert SVG path to Leaflet lat/lon polygon
+function svgPathToLatLng(pathD) {
+  // Parse SVG path commands - simplified for 'm' and 'l' commands
+  const coords = [];
+  const regex = /([ml])\s*([-\d.]+),([-\d.]+)/g;
+  let match;
+  while ((match = regex.exec(pathD)) !== null) {
+    const px = parseFloat(match[2]);
+    const py = parseFloat(match[3]);
+    // Convert pixel to lat/lon
+    const lon = SVG_GEO_BOUNDS.west + (px / SVG_WIDTH) * (SVG_GEO_BOUNDS.east - SVG_GEO_BOUNDS.west);
+    const lat = SVG_GEO_BOUNDS.north - (py / SVG_HEIGHT) * (SVG_GEO_BOUNDS.north - SVG_GEO_BOUNDS.south);
+    coords.push([lat, lon]);
+  }
+  return coords;
+}
+
+// Parse SVG path with proper handling of relative commands
+function parseSvgPath(pathD) {
+  const coords = [];
+  let x = 0, y = 0;
+  let firstX = 0, firstY = 0;
+  
+  // Split path into commands
+  const commands = pathD.match(/[a-zA-Z][^a-zA-Z]*/g) || [];
+  
+  for (const cmd of commands) {
+    const type = cmd[0];
+    const args = cmd.slice(1).trim().split(/[\s,]+/).filter(s => s).map(Number);
+    
+    for (let i = 0; i < args.length; i += 2) {
+      const dx = args[i];
+      const dy = args[i + 1];
+      
+      switch (type) {
+        case 'm': // relative move
+          x += dx;
+          y += dy;
+          if (coords.length === 0) {
+            firstX = x;
+            firstY = y;
+          }
+          break;
+        case 'l': // relative line
+          x += dx;
+          y += dy;
+          break;
+        case 'M': // absolute move
+          x = dx;
+          y = dy;
+          if (coords.length === 0) {
+            firstX = x;
+            firstY = y;
+          }
+          break;
+        case 'L': // absolute line
+          x = dx;
+          y = dy;
+          break;
+        case 'z': // close path
+          x = firstX;
+          y = firstY;
+          break;
+        default:
+          // Skip other commands for now
+          continue;
+      }
+      
+      // Convert pixel to lat/lon
+      const lon = SVG_GEO_BOUNDS.west + (x / SVG_WIDTH) * (SVG_GEO_BOUNDS.east - SVG_GEO_BOUNDS.west);
+      const lat = SVG_GEO_BOUNDS.north - (y / SVG_HEIGHT) * (SVG_GEO_BOUNDS.north - SVG_GEO_BOUNDS.south);
+      
+      coords.push([lat, lon]);
+    }
+  }
+  
+  return coords;
+}
+
+// Convert SVG pixel coordinates to Leaflet's simple CRS coordinates
+// SVG origin is top-left, but Leaflet uses bottom-left origin
+function parseSvgPathToSimple(pathD, svgWidth, svgHeight) {
+  const coords = [];
+  
+  // Split path into commands
+  const commands = pathD.match(/[a-zA-Z][^a-zA-Z]*/g) || [];
+  
+  let x = 0;
+  let y = 0;
+  let startX = 0;
+  let startY = 0;
+  
+  for (const cmd of commands) {
+    const type = cmd[0].toLowerCase();
+    const args = cmd.slice(1).trim().split(/[,\s]+/).map(Number).filter(n => !isNaN(n));
+    
+    switch (type) {
+      case 'm': // move to (relative)
+        x += args[0];
+        y += args[1];
+        startX = x;
+        startY = y;
+        // Convert: flip Y axis (Leaflet uses bottom-left as origin)
+        coords.push([svgHeight - y, x]);
+        break;
+      case 'l': // line to (relative)
+        x += args[0];
+        y += args[1];
+        coords.push([svgHeight - y, x]);
+        break;
+      case 'h': // horizontal line (relative)
+        x += args[0];
+        coords.push([svgHeight - y, x]);
+        break;
+      case 'v': // vertical line (relative)
+        y += args[0];
+        coords.push([svgHeight - y, x]);
+        break;
+      case 'z': // close path
+        if (coords.length > 0) {
+          x = startX;
+          y = startY;
+          coords.push(coords[0].slice()); // Close back to start
+        }
+        break;
+      // Handle absolute commands
+      case 'M': // move to (absolute)
+        x = args[0];
+        y = args[1];
+        startX = x;
+        startY = y;
+        coords.push([svgHeight - y, x]);
+        break;
+      case 'L': // line to (absolute)
+        x = args[0];
+        y = args[1];
+        coords.push([svgHeight - y, x]);
+        break;
+      case 'H': // horizontal line (absolute)
+        x = args[0];
+        coords.push([svgHeight - y, x]);
+        break;
+      case 'V': // vertical line (absolute)
+        y = args[0];
+        coords.push([svgHeight - y, x]);
+        break;
+    }
+  }
+  
+  return coords;
+}
+
+function buildMap() {
+  // Use geographic CRS (WGS84) - original approach
+  spainMap = L.map('spainMap', {
+    center: [40.0, -4.0],
+    zoom: 5,
+    zoomControl: true,
+    attributionControl: true
+  });
+  
+  // Add tile layer as background
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(spainMap);
+  
+  // Create bounds from geoViewBox
+  const southWest = [SVG_GEO_BOUNDS.south, SVG_GEO_BOUNDS.west];
+  const northEast = [SVG_GEO_BOUNDS.north, SVG_GEO_BOUNDS.east];
+  const bounds = L.latLngBounds(southWest, northEast);
+  
+  // Add SVG as image overlay (this shows correctly)
+  L.imageOverlay('spain.svg', bounds).addTo(spainMap);
+  spainMap.fitBounds(bounds);
+  
+  // Also load the SVG paths for interactivity
+  fetch('spain.svg')
+    .then(res => res.text())
+    .then(svgText => {
+      const parser = new DOMParser();
+      const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+      const paths = svgDoc.querySelectorAll('path');
+      
+      geoJsonLayer = L.layerGroup().addTo(spainMap);
+      
+      paths.forEach(path => {
+        const regionId = path.getAttribute('id');
+        const regionName = path.getAttribute('title');
+        const pathD = path.getAttribute('d');
+        
+        if (!regionId || !REGION_CODES[regionId]) return;
+        
+        const community = REGION_CODES[regionId];
+        
+        // Convert SVG pixel coordinates to lat/lon using geoViewBox bounds
+        const coords = parseSvgPath(pathD);
+        
+        if (coords.length < 3) return;
+        
+        const polygon = L.polygon(coords, {
+          fillColor: community.foral ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.1)',
+          weight: 1,
+          opacity: 0.5,
+          color: 'rgba(255,255,255,0.15)',
+          fillOpacity: 0.5
+        });
+        
+        // Add to layer with metadata
+        polygon.feature = { properties: { community: community, regionId: regionId } };
+        
+        if (!community.foral) {
+          const communityData = COMMUNITIES.find(c => c.id === community.id);
+          if (communityData) {
+            polygon.on('click', function() {
+              cc = communityData;
+              renderPills();
+              updateAll();
+            });
+            polygon.on('mouseover', function(e) {
+              polygon.setStyle({
+                weight: 2,
+                color: 'rgba(255,255,255,0.8)',
+                fillOpacity: 0.8
+              });
+              showMapTipSvg(community, cc);
+            });
+            polygon.on('mouseout', function(e) {
+              colorizeMapSvg();
+              document.getElementById('mapTooltip').style.display = 'none';
+            });
+          }
+        }
+        
+        polygon.addTo(geoJsonLayer);
+      });
+      
+      colorizeMapSvg();
+    })
+    .catch(err => console.error('Error loading SVG:', err));
+}
+
+function colorizeMapSvg() {
+  if (!geoJsonLayer) return;
+  
+  const all = COMMUNITIES.filter(c => !c.foral).map(c => ({c, r: calcIRPF(salary, c)}));
+  const nets = all.map(x => x.r.net), minN = Math.min(...nets), maxN = Math.max(...nets);
+  
+  geoJsonLayer.eachLayer(function(layer) {
+    const community = layer.feature?.properties?.community;
+    if (!community || community.foral) return;
+    
+    const communityInfo = COMMUNITIES.find(c => c.id === community.id);
+    if (!communityInfo) return;
+    
+    const r = calcIRPF(salary, communityInfo);
+    if (!r) return;
+    
+    const t = (r.net - minN) / (maxN - minN || 1);
+    const fill = lerp(t);
+    const isSelected = communityInfo.id === cc.id;
+    
+    layer.setStyle({
+      fillColor: fill,
+      weight: isSelected ? 2 : 1,
+      color: isSelected ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.15)',
+      fillOpacity: 0.7,
+      opacity: 0.5
+    });
   });
 }
 
-function showMapTip(e,c){
-  const r=calcIRPF(salary,c);if(!r)return;
-  const all=COMMUNITIES.filter(c=>!c.foral).map(c=>({c,r:calcIRPF(salary,c)})).sort((a,b)=>b.r.net-a.r.net);
-  const rank=all.findIndex(x=>x.c.id===c.id)+1;
-  const tp=document.getElementById('mapTooltip');
-  tp.innerHTML=`<div class="mt-name">${c.emoji} ${c.name}</div>
+function showMapTipSvg(community, cc) {
+  const r = calcIRPF(salary, cc);
+  if (!r) return;
+  
+  const all = COMMUNITIES.filter(c => !c.foral).map(c => ({c, r: calcIRPF(salary, c)})).sort((a, b) => b.r.net - a.r.net);
+  const rank = all.findIndex(x => x.c.id === community.id) + 1;
+  
+  const tp = document.getElementById('mapTooltip');
+  tp.innerHTML = `<div class="mt-name">${community.emoji} ${community.name}</div>
     <div class="mt-row"><span>Neto anual</span><strong style="color:var(--green)">${fmt(r.net)}</strong></div>
     <div class="mt-row"><span>IRPF</span><strong style="color:var(--red)">${fmt(r.irpf)}</strong></div>
     <div class="mt-row"><span>Tipo efectivo</span><strong>${pct(r.effIRPF)}</strong></div>
     <div class="mt-row"><span>Ranking</span><strong>#${rank} de 15</strong></div>`;
-  const svgEl=document.getElementById('spainMapSvg');
-  const svgR=svgEl.getBoundingClientRect();
-  let x=e.clientX-svgR.left+14,y=e.clientY-svgR.top-20;
-  if(x+200>svgR.width)x-=220;if(y<0)y=10;
-  tp.style.left=x+'px';tp.style.top=y+'px';tp.style.display='block';
+  
+  // Find the layer for this community
+  let targetLayer = null;
+  geoJsonLayer.eachLayer(function(layer) {
+    if (layer.feature?.properties?.regionId === community.id) {
+      targetLayer = layer;
+    }
+  });
+  
+  if (!targetLayer) {
+    tp.style.display = 'none';
+    return;
+  }
+  
+  const bounds = targetLayer.getBounds();
+  const center = bounds.getCenter();
+  const mapEl = document.getElementById('spainMap');
+  const mapRect = mapEl.getBoundingClientRect();
+  const point = spainMap.latLngToContainerPoint(center);
+  
+  let x = point.x + 14, y = point.y - 20;
+  if (x + 200 > mapRect.width) x -= 220;
+  if (y < 0) y = 10;
+  
+  tp.style.left = x + 'px';
+  tp.style.top = y + 'px';
+  tp.style.display = 'block';
 }
+
+// Keep old functions for compatibility but they'll be replaced
+function groupByCommunity(geojson) { return geojson; }
+function onEachFeature(feature, layer) {}
+function defaultStyle(feature) { return {}; }
+function showMapTip(feature, community) {}
+function colorizeMap() { colorizeMapSvg(); }
 
 // ══════════════ RANK PANEL ══════════════
 
