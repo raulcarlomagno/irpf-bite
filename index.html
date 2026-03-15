@@ -1,1194 +1,2216 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>¿Cuánto te queda de verdad? — IRPF España 2026</title>
-<meta name="description" content="La calculadora que nadie te explica. Descubre cuánto IRPF pagas realmente y compara entre comunidades autónomas.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>¿Cuánto te queda de verdad? — IRPF España 2026</title>
+  <meta name="description"
+    content="La calculadora que nadie te explica. Descubre cuánto IRPF pagas realmente y compara entre comunidades autónomas.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg0:#040610;--bg1:#080b18;--bg2:#0d1024;--bg3:#141828;
-  --border:rgba(255,255,255,0.07);--border-hi:rgba(255,200,60,0.25);
-  --text:#dde0f0;--muted:#5a5f80;--muted2:#7a7fa0;
-  --amber:#ffc83d;--amber2:#ff9d00;
-  --green:#00e87a;--red:#ff3a5c;--blue:#5b8eff;--purple:#a07cf8;
-  --font-d:'Bricolage Grotesque',sans-serif;
-  --font-b:'DM Sans',sans-serif;
-  --font-m:'DM Mono',monospace;
-  --r:14px;--r-lg:20px;
-}
-html{scroll-behavior:smooth}
-body{font-family:var(--font-b);background:var(--bg0);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.5}
-body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.6}
-.wrap{max-width:1200px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
 
-/* HERO */
-.hero{padding:64px 0 0;position:relative}
-.hero__glow{position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:900px;height:500px;background:radial-gradient(ellipse at 50% 30%,rgba(255,200,60,.07) 0%,rgba(90,80,200,.04) 40%,transparent 70%);pointer-events:none}
-.hero__tag{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-m);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--amber);background:rgba(255,200,60,.08);border:1px solid rgba(255,200,60,.18);padding:6px 14px;border-radius:100px;margin-bottom:24px}
-.hero__title{font-family:var(--font-d);font-size:clamp(38px,7vw,80px);font-weight:800;line-height:1.0;letter-spacing:-2.5px;margin-bottom:16px}
-.hero__title em{font-style:normal;color:var(--amber)}
-.hero__sub{font-size:16px;color:var(--muted2);max-width:520px;line-height:1.7}
-.divider{height:1px;background:var(--border);margin:36px 0}
+    :root {
+      --bg0: #040610;
+      --bg1: #080b18;
+      --bg2: #0d1024;
+      --bg3: #141828;
+      --border: rgba(255, 255, 255, 0.07);
+      --border-hi: rgba(255, 200, 60, 0.25);
+      --text: #dde0f0;
+      --muted: #5a5f80;
+      --muted2: #7a7fa0;
+      --amber: #ffc83d;
+      --amber2: #ff9d00;
+      --green: #00e87a;
+      --red: #ff3a5c;
+      --blue: #5b8eff;
+      --purple: #a07cf8;
+      --font-d: 'Bricolage Grotesque', sans-serif;
+      --font-b: 'DM Sans', sans-serif;
+      --font-m: 'DM Mono', monospace;
+      --r: 14px;
+      --r-lg: 20px;
+    }
 
-/* SLIDER */
-.slider-block{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:32px 36px;margin-bottom:24px;position:relative;overflow:hidden}
-.slider-block::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--amber2),var(--amber),transparent)}
-.slider-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:24px}
-.slider-label{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.slider-amount{font-family:var(--font-d);font-size:clamp(36px,5vw,58px);font-weight:800;letter-spacing:-2px;color:var(--amber);line-height:1}
-.slider-monthly{font-family:var(--font-m);font-size:12px;color:var(--muted2);margin-top:6px}
-.presets{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
-.preset-btn{font-family:var(--font-m);font-size:12px;color:var(--muted2);background:var(--bg3);border:1px solid var(--border);border-radius:100px;padding:6px 14px;cursor:pointer;transition:all .18s}
-.preset-btn:hover,.preset-btn.active{background:rgba(255,200,60,.1);border-color:var(--border-hi);color:var(--amber)}
-.range-wrap{padding:10px 0}
-input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:100px;border:none;outline:none;cursor:pointer;background:linear-gradient(to right,var(--amber2) 0%,var(--amber) var(--pct,12%),rgba(255,255,255,.08) var(--pct,12%),rgba(255,255,255,.08) 100%)}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 5px rgba(255,200,60,.18),0 4px 16px rgba(0,0,0,.4);cursor:pointer;transition:transform .12s}
-input[type=range]::-webkit-slider-thumb:active{transform:scale(1.15)}
-input[type=range]::-moz-range-thumb{width:22px;height:22px;border:none;border-radius:50%;background:var(--amber);box-shadow:0 0 0 5px rgba(255,200,60,.18);cursor:pointer}
-.range-marks{display:flex;justify-content:space-between;margin-top:6px}
-.range-mark{font-family:var(--font-m);font-size:10px;color:var(--muted);text-align:center}
-.range-mark small{display:block;font-size:9px;opacity:.6}
+    html {
+      scroll-behavior: smooth
+    }
 
-/* TOGGLE */
-.toggle-row{display:flex;align-items:center;gap:10px;margin-bottom:16px}
-.toggle-label{font-size:12px;color:var(--muted2)}
-.toggle{display:flex;background:var(--bg3);border:1px solid var(--border);border-radius:100px;padding:3px}
-.toggle-opt{font-family:var(--font-m);font-size:11px;padding:5px 14px;border-radius:100px;cursor:pointer;color:var(--muted);transition:all .15s;border:none;background:none}
-.toggle-opt.active{background:var(--amber);color:var(--bg0);font-weight:600}
+    body {
+      font-family: var(--font-b);
+      background: var(--bg0);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5
+    }
 
-/* SECTION HEAD */
-.section-head{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: .6
+    }
 
-/* PILLS */
-.community-pills{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:28px}
-.pill{font-family:var(--font-b);font-size:13px;font-weight:500;color:var(--muted2);background:var(--bg2);border:1px solid var(--border);border-radius:100px;padding:7px 16px;cursor:pointer;transition:all .15s;white-space:nowrap}
-.pill:hover{border-color:rgba(255,255,255,.15);color:var(--text)}
-.pill.active{background:rgba(255,200,60,.1);border-color:var(--amber2);color:var(--amber);font-weight:600}
-.pill.foral{opacity:.4;font-style:italic;cursor:not-allowed}
-.pill.foral:hover{border-color:var(--border);color:var(--muted2)}
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1
+    }
 
-/* STATS */
-.stats-row{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:20px}
-@media(max-width:1100px){.stats-row{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:600px){.stats-row{grid-template-columns:repeat(2,1fr)}}
-.stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center}
-.stat--hi{background:rgba(0,232,122,.05);border-color:rgba(0,232,122,.2)}
-.stat--warn{background:rgba(255,58,92,.05);border-color:rgba(255,58,92,.12)}
-.stat__label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
-.stat__val{font-family:var(--font-d);font-size:19px;font-weight:700;letter-spacing:-.5px}
-.stat__val.green{color:var(--green)}.stat__val.red{color:var(--red)}.stat__val.amber{color:var(--amber)}.stat__val.blue{color:var(--blue)}
-.stat__sub{font-family:var(--font-m);font-size:10px;color:var(--muted);margin-top:4px}
+    /* HERO */
+    .hero {
+      padding: 64px 0 0;
+      position: relative
+    }
 
-/* INSIGHT */
-.insight{border:1px solid var(--border-hi);background:rgba(255,200,60,.04);border-radius:var(--r);padding:18px 22px;margin-bottom:24px;display:flex;gap:14px;align-items:flex-start}
-.insight__ico{font-size:26px;line-height:1;flex-shrink:0}
-.insight__title{font-family:var(--font-d);font-size:16px;font-weight:700;color:var(--amber);margin-bottom:4px}
-.insight__body{font-size:13px;color:var(--muted2);line-height:1.65}
-.insight__body strong{color:var(--text);font-weight:600}
+    .hero__glow {
+      position: absolute;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 500px;
+      background: radial-gradient(ellipse at 50% 30%, rgba(255, 200, 60, .07) 0%, rgba(90, 80, 200, .04) 40%, transparent 70%);
+      pointer-events: none
+    }
 
-/* VIRAL CARD */
-.viral-card{background:linear-gradient(135deg,#0d1024 0%,#141828 100%);border:1px solid rgba(255,200,60,.3);border-radius:var(--r-lg);padding:22px 26px;margin-bottom:28px;position:relative;overflow:hidden}
-.viral-card::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;background:radial-gradient(circle,rgba(255,200,60,.08) 0%,transparent 70%);pointer-events:none}
-.viral-quote{font-family:var(--font-d);font-size:clamp(14px,2vw,16px);font-weight:600;line-height:1.55;color:var(--text);margin-bottom:16px}
-.viral-quote em{color:var(--amber);font-style:normal}
-.viral-actions{display:flex;flex-wrap:wrap;gap:8px}
-.vbtn{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-b);font-size:12px;font-weight:600;border-radius:100px;padding:9px 18px;cursor:pointer;transition:all .18s;border:none}
-.vbtn--primary{background:var(--amber);color:var(--bg0)}.vbtn--primary:hover{background:var(--amber2);transform:scale(1.03)}
-.vbtn--ghost{background:transparent;color:var(--muted2);border:1px solid var(--border)}.vbtn--ghost:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
-.vbtn--x{background:#000;color:#fff;border:1px solid rgba(255,255,255,.15)}.vbtn--x:hover{background:#111}
+    .hero__tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-m);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--amber);
+      background: rgba(255, 200, 60, .08);
+      border: 1px solid rgba(255, 200, 60, .18);
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 24px
+    }
 
-/* CHARTS */
-.charts-2col{display:grid;grid-template-columns:3fr 2fr;gap:16px;margin-bottom:20px}
-@media(max-width:860px){.charts-2col{grid-template-columns:1fr}}
-.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px}
-@media(max-width:860px){.charts-row{grid-template-columns:1fr}}
-.chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px}
-.chart-card__title{font-family:var(--font-d);font-size:15px;font-weight:700;margin-bottom:3px}
-.chart-card__sub{font-size:11px;color:var(--muted);margin-bottom:18px}
-.chart-wrap{position:relative;height:250px}
+    .hero__title {
+      font-family: var(--font-d);
+      font-size: clamp(38px, 7vw, 80px);
+      font-weight: 800;
+      line-height: 1.0;
+      letter-spacing: -2.5px;
+      margin-bottom: 16px
+    }
 
-/* MAP */
-.map-grid{display:grid;grid-template-columns:1fr 360px;gap:16px;align-items:start;margin-bottom:28px}
-@media(max-width:900px){.map-grid{grid-template-columns:1fr}}
-.map-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px;position:relative}
-.map-card__title{font-family:var(--font-d);font-size:15px;font-weight:700;margin-bottom:3px}
-.map-card__sub{font-size:11px;color:var(--muted);margin-bottom:14px}
-#spainMap{height:450px;width:100%;border-radius:12px;overflow:hidden;background:var(--bg1)}
-.leaflet-container{background:var(--bg1);font-family:var(--font-b)}
-.leaflet-control-zoom a{background:var(--bg2)!important;color:var(--text)!important;border-color:var(--border)!important}
-.leaflet-control-zoom a:hover{background:var(--bg3)!important}
-.leaflet-control-attribution{background:rgba(4,6,16,.8)!important;color:var(--muted)!important;font-size:9px}
-.leaflet-control-attribution a{color:var(--muted2)!important}
-.map-legend{display:flex;align-items:center;gap:8px;margin-top:10px;justify-content:center}
-.map-legend-bar{width:140px;height:8px;border-radius:4px;background:linear-gradient(to right,#ff3a5c,#ff9d00,#00e87a)}
-.map-legend-txt{font-family:var(--font-m);font-size:10px;color:var(--muted)}
-.map-tooltip{position:absolute;background:#080b18;border:1px solid rgba(255,200,60,.35);border-radius:10px;padding:12px 15px;pointer-events:none;font-size:12px;color:var(--text);box-shadow:0 8px 28px rgba(0,0,0,.6);display:none;z-index:200;min-width:175px}
-.mt-name{font-family:var(--font-d);font-size:14px;font-weight:700;margin-bottom:7px}
-.mt-row{display:flex;justify-content:space-between;gap:14px;color:var(--muted2);margin-bottom:3px;font-size:11px}
-.mt-row strong{color:var(--text);font-family:var(--font-m)}
+    .hero__title em {
+      font-style: normal;
+      color: var(--amber)
+    }
 
-/* RANKING SIDE PANEL */
-.rank-panel{display:flex;flex-direction:column;gap:8px}
-.rp-item{display:flex;align-items:center;gap:10px;padding:9px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s}
-.rp-item:hover,.rp-item.active{border-color:var(--amber2);background:rgba(255,200,60,.06)}
-.rp-rank{font-family:var(--font-m);font-size:10px;color:var(--muted);width:18px;text-align:center;flex-shrink:0}
-.rp-name{font-size:12px;font-weight:500;flex:1}
-.rp-bar-wrap{width:70px;height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
-.rp-bar{height:100%;border-radius:3px;transition:width .3s}
-.rp-val{font-family:var(--font-m);font-size:11px;width:68px;text-align:right;flex-shrink:0}
+    .hero__sub {
+      font-size: 16px;
+      color: var(--muted2);
+      max-width: 520px;
+      line-height: 1.7
+    }
 
-/* COMPARE */
-.compare-trio{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px}
-@media(max-width:660px){.compare-trio{grid-template-columns:1fr}}
-.compare-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 16px;text-align:center;position:relative;overflow:hidden}
-.compare-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
-.compare-card.best::after{background:var(--green)}.compare-card.worst::after{background:var(--red)}.compare-card.mine::after{background:var(--amber)}
-.cc-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border-radius:100px;margin-bottom:10px}
-.cc-tag.best{background:rgba(0,232,122,.12);color:var(--green)}.cc-tag.worst{background:rgba(255,58,92,.12);color:var(--red)}.cc-tag.mine{background:rgba(255,200,60,.12);color:var(--amber)}
-.cc-name{font-family:var(--font-d);font-size:16px;font-weight:700;margin-bottom:8px}
-.cc-net{font-family:var(--font-d);font-size:24px;font-weight:800;letter-spacing:-1px;margin-bottom:5px}
-.cc-detail{font-family:var(--font-m);font-size:11px;color:var(--muted)}
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 36px 0
+    }
 
-/* RANKING CHART */
-.ranking-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px;margin-bottom:28px}
-.ranking-wrap{position:relative;height:400px}
+    /* SLIDER */
+    .slider-block {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 32px 36px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden
+    }
 
-/* BREAKDOWN */
-.breakdown-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px;margin-bottom:28px}
-.breakdown-title{font-family:var(--font-d);font-size:15px;font-weight:700;margin-bottom:16px}
-.bd-table{width:100%;border-collapse:collapse}
-.bd-table td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px}
-.bd-table tr:last-child td{border-bottom:none}
-.bd-label{color:var(--muted2)}.bd-formula{font-family:var(--font-m);font-size:11px;color:var(--muted)}
-.bd-val{text-align:right;font-family:var(--font-m);font-weight:500}
-.bd-val.neg{color:var(--red)}.bd-val.pos{color:var(--green)}.bd-val.amb{color:var(--amber)}.bd-val.bl{color:var(--blue)}
-.bd-total td{background:rgba(0,232,122,.06)}.bd-total .bd-label{color:var(--text);font-weight:700}.bd-total .bd-val{color:var(--green);font-size:15px}
-.bd-sub td{padding-top:4px;padding-bottom:4px;border-bottom:1px solid rgba(255,255,255,.03)}
-.bd-sub .bd-label{color:var(--muted);font-size:12px;padding-left:28px}
-.bd-sub .bd-formula{font-size:10px}.bd-sub .bd-val{font-size:11px}
+    .slider-block::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--amber2), var(--amber), transparent)
+    }
 
-/* FOOTER */
-footer{border-top:1px solid var(--border);padding:36px 0 56px;text-align:center}
-footer p{font-size:12px;color:var(--muted);line-height:1.8;max-width:700px;margin:0 auto 5px}
-footer strong{color:var(--muted2)}
+    .slider-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 24px
+    }
 
-/* ANIMATIONS */
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.fade-up{animation:fadeUp .5s ease both}
-.d1{animation-delay:.05s}.d2{animation-delay:.1s}.d3{animation-delay:.15s}
-@media(max-width:600px){.slider-block,.chart-card,.ranking-card,.breakdown-card,.map-card{padding:18px 16px}}
-</style>
+    .slider-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px
+    }
+
+    .slider-amount {
+      font-family: var(--font-d);
+      font-size: clamp(36px, 5vw, 58px);
+      font-weight: 800;
+      letter-spacing: -2px;
+      color: var(--amber);
+      line-height: 1
+    }
+
+    .slider-monthly {
+      font-family: var(--font-m);
+      font-size: 12px;
+      color: var(--muted2);
+      margin-top: 6px
+    }
+
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      align-items: center
+    }
+
+    .preset-btn {
+      font-family: var(--font-m);
+      font-size: 12px;
+      color: var(--muted2);
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: all .18s
+    }
+
+    .preset-btn:hover,
+    .preset-btn.active {
+      background: rgba(255, 200, 60, .1);
+      border-color: var(--border-hi);
+      color: var(--amber)
+    }
+
+    .range-wrap {
+      padding: 10px 0
+    }
+
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 4px;
+      border-radius: 100px;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      background: linear-gradient(to right, var(--amber2) 0%, var(--amber) var(--pct, 12%), rgba(255, 255, 255, .08) var(--pct, 12%), rgba(255, 255, 255, .08) 100%)
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--amber);
+      box-shadow: 0 0 0 5px rgba(255, 200, 60, .18), 0 4px 16px rgba(0, 0, 0, .4);
+      cursor: pointer;
+      transition: transform .12s
+    }
+
+    input[type=range]::-webkit-slider-thumb:active {
+      transform: scale(1.15)
+    }
+
+    input[type=range]::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border: none;
+      border-radius: 50%;
+      background: var(--amber);
+      box-shadow: 0 0 0 5px rgba(255, 200, 60, .18);
+      cursor: pointer
+    }
+
+    .range-marks {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px
+    }
+
+    .range-mark {
+      font-family: var(--font-m);
+      font-size: 10px;
+      color: var(--muted);
+      text-align: center
+    }
+
+    .range-mark small {
+      display: block;
+      font-size: 9px;
+      opacity: .6
+    }
+
+    /* TOGGLE */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px
+    }
+
+    .toggle-label {
+      font-size: 12px;
+      color: var(--muted2)
+    }
+
+    .toggle {
+      display: flex;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 3px
+    }
+
+    .toggle-opt {
+      font-family: var(--font-m);
+      font-size: 11px;
+      padding: 5px 14px;
+      border-radius: 100px;
+      cursor: pointer;
+      color: var(--muted);
+      transition: all .15s;
+      border: none;
+      background: none
+    }
+
+    .toggle-opt.active {
+      background: var(--amber);
+      color: var(--bg0);
+      font-weight: 600
+    }
+
+    /* SECTION HEAD */
+    .section-head {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px
+    }
+
+    /* PILLS */
+    .community-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 28px
+    }
+
+    .pill {
+      font-family: var(--font-b);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted2);
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 7px 16px;
+      cursor: pointer;
+      transition: all .15s;
+      white-space: nowrap
+    }
+
+    .pill:hover {
+      border-color: rgba(255, 255, 255, .15);
+      color: var(--text)
+    }
+
+    .pill.active {
+      background: rgba(255, 200, 60, .1);
+      border-color: var(--amber2);
+      color: var(--amber);
+      font-weight: 600
+    }
+
+    .pill.foral {
+      opacity: .4;
+      font-style: italic;
+      cursor: not-allowed
+    }
+
+    .pill.foral:hover {
+      border-color: var(--border);
+      color: var(--muted2)
+    }
+
+    /* STATS */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      margin-bottom: 20px
+    }
+
+    @media(max-width:1100px) {
+      .stats-row {
+        grid-template-columns: repeat(3, 1fr)
+      }
+    }
+
+    @media(max-width:600px) {
+      .stats-row {
+        grid-template-columns: repeat(2, 1fr)
+      }
+    }
+
+    .stat {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 16px;
+      text-align: center
+    }
+
+    .stat--hi {
+      background: rgba(0, 232, 122, .05);
+      border-color: rgba(0, 232, 122, .2)
+    }
+
+    .stat--warn {
+      background: rgba(255, 58, 92, .05);
+      border-color: rgba(255, 58, 92, .12)
+    }
+
+    .stat__label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 7px
+    }
+
+    .stat__val {
+      font-family: var(--font-d);
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -.5px
+    }
+
+    .stat__val.green {
+      color: var(--green)
+    }
+
+    .stat__val.red {
+      color: var(--red)
+    }
+
+    .stat__val.amber {
+      color: var(--amber)
+    }
+
+    .stat__val.blue {
+      color: var(--blue)
+    }
+
+    .stat__sub {
+      font-family: var(--font-m);
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 4px
+    }
+
+    /* INSIGHT */
+    .insight {
+      border: 1px solid var(--border-hi);
+      background: rgba(255, 200, 60, .04);
+      border-radius: var(--r);
+      padding: 18px 22px;
+      margin-bottom: 24px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start
+    }
+
+    .insight__ico {
+      font-size: 26px;
+      line-height: 1;
+      flex-shrink: 0
+    }
+
+    .insight__title {
+      font-family: var(--font-d);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--amber);
+      margin-bottom: 4px
+    }
+
+    .insight__body {
+      font-size: 13px;
+      color: var(--muted2);
+      line-height: 1.65
+    }
+
+    .insight__body strong {
+      color: var(--text);
+      font-weight: 600
+    }
+
+    /* VIRAL CARD */
+    .viral-card {
+      background: linear-gradient(135deg, #0d1024 0%, #141828 100%);
+      border: 1px solid rgba(255, 200, 60, .3);
+      border-radius: var(--r-lg);
+      padding: 22px 26px;
+      margin-bottom: 28px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .viral-card::before {
+      content: '';
+      position: absolute;
+      top: -50px;
+      right: -50px;
+      width: 180px;
+      height: 180px;
+      background: radial-gradient(circle, rgba(255, 200, 60, .08) 0%, transparent 70%);
+      pointer-events: none
+    }
+
+    .viral-quote {
+      font-family: var(--font-d);
+      font-size: clamp(14px, 2vw, 16px);
+      font-weight: 600;
+      line-height: 1.55;
+      color: var(--text);
+      margin-bottom: 16px
+    }
+
+    .viral-quote em {
+      color: var(--amber);
+      font-style: normal
+    }
+
+    .viral-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px
+    }
+
+    .vbtn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-family: var(--font-b);
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 100px;
+      padding: 9px 18px;
+      cursor: pointer;
+      transition: all .18s;
+      border: none
+    }
+
+    .vbtn--primary {
+      background: var(--amber);
+      color: var(--bg0)
+    }
+
+    .vbtn--primary:hover {
+      background: var(--amber2);
+      transform: scale(1.03)
+    }
+
+    .vbtn--ghost {
+      background: transparent;
+      color: var(--muted2);
+      border: 1px solid var(--border)
+    }
+
+    .vbtn--ghost:hover {
+      border-color: rgba(255, 255, 255, .2);
+      color: var(--text)
+    }
+
+    .vbtn--x {
+      background: #000;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, .15)
+    }
+
+    .vbtn--x:hover {
+      background: #111
+    }
+
+    /* CHARTS */
+    .charts-2col {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 16px;
+      margin-bottom: 20px
+    }
+
+    @media(max-width:860px) {
+      .charts-2col {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 28px
+    }
+
+    @media(max-width:860px) {
+      .charts-row {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .chart-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 24px
+    }
+
+    .chart-card__title {
+      font-family: var(--font-d);
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 3px
+    }
+
+    .chart-card__sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 18px
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 250px
+    }
+
+    /* MAP */
+    .map-grid {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 28px
+    }
+
+    @media(max-width:900px) {
+      .map-grid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .map-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 24px;
+      position: relative
+    }
+
+    .map-card__title {
+      font-family: var(--font-d);
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 3px
+    }
+
+    .map-card__sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 14px
+    }
+
+    #spainMap {
+      height: 450px;
+      width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--bg1)
+    }
+
+    .leaflet-container {
+      background: var(--bg1);
+      font-family: var(--font-b)
+    }
+
+    .leaflet-control-zoom a {
+      background: var(--bg2) !important;
+      color: var(--text) !important;
+      border-color: var(--border) !important
+    }
+
+    .leaflet-control-zoom a:hover {
+      background: var(--bg3) !important
+    }
+
+    .leaflet-control-attribution {
+      background: rgba(4, 6, 16, .8) !important;
+      color: var(--muted) !important;
+      font-size: 9px
+    }
+
+    .leaflet-control-attribution a {
+      color: var(--muted2) !important
+    }
+
+    .map-legend {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      justify-content: center
+    }
+
+    .map-legend-bar {
+      width: 140px;
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(to right, #ff3a5c, #ff9d00, #00e87a)
+    }
+
+    .map-legend-txt {
+      font-family: var(--font-m);
+      font-size: 10px;
+      color: var(--muted)
+    }
+
+    .map-tooltip {
+      position: absolute;
+      background: #080b18;
+      border: 1px solid rgba(255, 200, 60, .35);
+      border-radius: 10px;
+      padding: 12px 15px;
+      pointer-events: none;
+      font-size: 12px;
+      color: var(--text);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, .6);
+      display: none;
+      z-index: 200;
+      min-width: 175px
+    }
+
+    .mt-name {
+      font-family: var(--font-d);
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 7px
+    }
+
+    .mt-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      color: var(--muted2);
+      margin-bottom: 3px;
+      font-size: 11px
+    }
+
+    .mt-row strong {
+      color: var(--text);
+      font-family: var(--font-m)
+    }
+
+    /* RANKING SIDE PANEL */
+    .rank-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .rp-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 13px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all .15s
+    }
+
+    .rp-item:hover,
+    .rp-item.active {
+      border-color: var(--amber2);
+      background: rgba(255, 200, 60, .06)
+    }
+
+    .rp-rank {
+      font-family: var(--font-m);
+      font-size: 10px;
+      color: var(--muted);
+      width: 18px;
+      text-align: center;
+      flex-shrink: 0
+    }
+
+    .rp-name {
+      font-size: 12px;
+      font-weight: 500;
+      flex: 1
+    }
+
+    .rp-bar-wrap {
+      width: 70px;
+      height: 5px;
+      background: rgba(255, 255, 255, .06);
+      border-radius: 3px;
+      overflow: hidden
+    }
+
+    .rp-bar {
+      height: 100%;
+      border-radius: 3px;
+      transition: width .3s
+    }
+
+    .rp-val {
+      font-family: var(--font-m);
+      font-size: 11px;
+      width: 68px;
+      text-align: right;
+      flex-shrink: 0
+    }
+
+    /* COMPARE */
+    .compare-trio {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 20px
+    }
+
+    @media(max-width:660px) {
+      .compare-trio {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .compare-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 20px 16px;
+      text-align: center;
+      position: relative;
+      overflow: hidden
+    }
+
+    .compare-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px
+    }
+
+    .compare-card.best::after {
+      background: var(--green)
+    }
+
+    .compare-card.worst::after {
+      background: var(--red)
+    }
+
+    .compare-card.mine::after {
+      background: var(--amber)
+    }
+
+    .cc-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 100px;
+      margin-bottom: 10px
+    }
+
+    .cc-tag.best {
+      background: rgba(0, 232, 122, .12);
+      color: var(--green)
+    }
+
+    .cc-tag.worst {
+      background: rgba(255, 58, 92, .12);
+      color: var(--red)
+    }
+
+    .cc-tag.mine {
+      background: rgba(255, 200, 60, .12);
+      color: var(--amber)
+    }
+
+    .cc-name {
+      font-family: var(--font-d);
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px
+    }
+
+    .cc-net {
+      font-family: var(--font-d);
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 5px
+    }
+
+    .cc-detail {
+      font-family: var(--font-m);
+      font-size: 11px;
+      color: var(--muted)
+    }
+
+    /* RANKING CHART */
+    .ranking-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 24px;
+      margin-bottom: 28px
+    }
+
+    .ranking-wrap {
+      position: relative;
+      height: 400px
+    }
+
+    /* BREAKDOWN */
+    .breakdown-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 24px;
+      margin-bottom: 28px
+    }
+
+    .breakdown-title {
+      font-family: var(--font-d);
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 16px
+    }
+
+    .bd-table {
+      width: 100%;
+      border-collapse: collapse
+    }
+
+    .bd-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px
+    }
+
+    .bd-table tr:last-child td {
+      border-bottom: none
+    }
+
+    .bd-label {
+      color: var(--muted2)
+    }
+
+    .bd-formula {
+      font-family: var(--font-m);
+      font-size: 11px;
+      color: var(--muted)
+    }
+
+    .bd-val {
+      text-align: right;
+      font-family: var(--font-m);
+      font-weight: 500
+    }
+
+    .bd-val.neg {
+      color: var(--red)
+    }
+
+    .bd-val.pos {
+      color: var(--green)
+    }
+
+    .bd-val.amb {
+      color: var(--amber)
+    }
+
+    .bd-val.bl {
+      color: var(--blue)
+    }
+
+    .bd-total td {
+      background: rgba(0, 232, 122, .06)
+    }
+
+    .bd-total .bd-label {
+      color: var(--text);
+      font-weight: 700
+    }
+
+    .bd-total .bd-val {
+      color: var(--green);
+      font-size: 15px
+    }
+
+    .bd-sub td {
+      padding-top: 4px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid rgba(255, 255, 255, .03)
+    }
+
+    .bd-sub .bd-label {
+      color: var(--muted);
+      font-size: 12px;
+      padding-left: 28px
+    }
+
+    .bd-sub .bd-formula {
+      font-size: 10px
+    }
+
+    .bd-sub .bd-val {
+      font-size: 11px
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 36px 0 56px;
+      text-align: center
+    }
+
+    footer p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.8;
+      max-width: 700px;
+      margin: 0 auto 5px
+    }
+
+    footer strong {
+      color: var(--muted2)
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .fade-up {
+      animation: fadeUp .5s ease both
+    }
+
+    .d1 {
+      animation-delay: .05s
+    }
+
+    .d2 {
+      animation-delay: .1s
+    }
+
+    .d3 {
+      animation-delay: .15s
+    }
+
+    @media(max-width:600px) {
+
+      .slider-block,
+      .chart-card,
+      .ranking-card,
+      .breakdown-card,
+      .map-card {
+        padding: 18px 16px
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<header class="hero fade-up">
-<div class="wrap">
-  <div class="hero__glow"></div>
-  <div class="hero__tag">💰 <span>IRPF España · Datos 2026</span></div>
-  <h1 class="hero__title">¿Cuánto te queda<br><em>de verdad?</em> <img src="spain_flag_120x80.png" alt="España" style="width: 60px; height: 40px; vertical-align: middle; margin-left: 8px;"></h1>
-  <p class="hero__sub">La calculadora que nadie te explica. Bruto → Neto real. IRPF + Seguridad Social. Compara las 15 comunidades de régimen común.</p>
-</div>
-</header>
-
-<main><div class="wrap">
-<div class="divider"></div>
-
-<!-- SLIDER -->
-<div class="slider-block fade-up d1">
-  <div class="slider-top">
-    <div>
-      <div class="slider-label">Tu salario bruto anual</div>
-      <div class="slider-amount" id="salaryDisplay">35.000 €</div>
-      <div class="slider-monthly" id="salaryMonthly">≈ 2.917 € / mes · 2.500 € / paga (14)</div>
+  <header class="hero fade-up">
+    <div class="wrap">
+      <div class="hero__glow"></div>
+      <div class="hero__tag">💰 <span>IRPF España · Datos 2026</span></div>
+      <h1 class="hero__title">¿Cuánto te queda<br><em>de verdad?</em> <img src="spain_flag_120x80.png" alt="España"
+          style="width: 60px; height: 40px; vertical-align: middle; margin-left: 8px;"></h1>
+      <p class="hero__sub">La calculadora que nadie te explica. Bruto → Neto real. IRPF + Seguridad Social. Compara las
+        15 comunidades de régimen común.</p>
     </div>
-    <div class="presets">
-      <span class="toggle-label">Atajos:</span>
-      <button class="preset-btn" data-val="18000">18k</button>
-      <button class="preset-btn" data-val="26000">26k<small style="font-size:9px;display:block;opacity:.6">mediana</small></button>
-      <button class="preset-btn" data-val="40000">40k</button>
-      <button class="preset-btn" data-val="60000">60k</button>
-      <button class="preset-btn" data-val="100000">100k</button>
-      <button class="preset-btn" data-val="200000">200k</button>
-    </div>
-  </div>
-  <div class="range-wrap">
-    <input type="range" id="salarySlider" min="0" max="300000" step="500" value="35000">
-  </div>
-  <div class="range-marks">
-    <div class="range-mark">0 €</div>
-    <div class="range-mark">26k€<small>mediana ES</small></div>
-    <div class="range-mark">100k€</div>
-    <div class="range-mark">200k€</div>
-    <div class="range-mark" style="text-align:right">300k€</div>
-  </div>
-</div>
+  </header>
 
-<!-- MODE + PILLS -->
-<div class="fade-up d2">
-  <div class="toggle-row">
-    <span class="toggle-label">Ver como:</span>
-    <div class="toggle">
-      <button class="toggle-opt active" id="togYear">Anual</button>
-      <button class="toggle-opt" id="togMonth12">Mensual (12)</button>
-      <button class="toggle-opt" id="togMonth14">Por paga (14)</button>
-    </div>
-  </div>
-  <div class="section-head">Comunidad Autónoma seleccionada</div>
-  <div class="community-pills" id="communityPills"></div>
-</div>
+  <main>
+    <div class="wrap">
+      <div class="divider"></div>
 
-<!-- STATS -->
-<div class="stats-row fade-up d3" id="statsRow">
-  <div class="stat"><div class="stat__label">Salario Bruto</div><div class="stat__val amber" id="sBruto">—</div></div>
-  <div class="stat stat--warn"><div class="stat__label">Seg. Social</div><div class="stat__val red" id="sSS">—</div><div class="stat__sub">6,35%</div></div>
-  <div class="stat stat--warn"><div class="stat__label">IRPF</div><div class="stat__val red" id="sIRPF">—</div><div class="stat__sub">Estado + CCAA</div></div>
-  <div class="stat stat--hi"><div class="stat__label">💚 Neto Real</div><div class="stat__val green" id="sNeto">—</div></div>
-  <div class="stat"><div class="stat__label">Tipo Efectivo</div><div class="stat__val blue" id="sTipoEf">—</div><div class="stat__sub">IRPF / bruto</div></div>
-  <div class="stat"><div class="stat__label">Marginal</div><div class="stat__val" id="sMarginal" style="color:var(--purple)">—</div><div class="stat__sub">retención extra</div></div>
-</div>
-
-<!-- INSIGHT -->
-<div class="insight fade-up d3" id="insightBox">
-  <div class="insight__ico">💡</div>
-  <div><div class="insight__title" id="insightTitle">…</div><div class="insight__body" id="insightBody">…</div></div>
-</div>
-
-<!-- VIRAL CARD -->
-<div class="viral-card fade-up">
-  <div class="viral-quote" id="viralQuote">…</div>
-  <div class="viral-actions">
-    <button class="vbtn vbtn--x" onclick="shareTwitter()">
-      <svg width="13" height="13" fill="white" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.741l7.73-8.835L1.254 2.25H8.08l4.259 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-      Compartir en X
-    </button>
-    <button class="vbtn vbtn--ghost" onclick="copyText()">📋 Copiar texto</button>
-    <button class="vbtn vbtn--ghost" onclick="shareUrl()">🔗 URL compartible</button>
-  </div>
-</div>
-
-<!-- MAP -->
-<div class="fade-up">
-  <div class="section-head">Mapa fiscal de España — neto para tu salario</div>
-  <div class="map-grid">
-    <div class="map-card">
-      <div class="map-card__title">¿Dónde te queda más dinero?</div>
-      <div class="map-card__sub">Verde = más neto · Rojo = menos neto · Haz clic para seleccionar comunidad</div>
-      <div id="spainMap"></div>
-      <div class="map-legend">
-        <span class="map-legend-txt">Menos neto</span>
-        <div class="map-legend-bar"></div>
-        <span class="map-legend-txt">Más neto</span>
+      <!-- SLIDER -->
+      <div class="slider-block fade-up d1">
+        <div class="slider-top">
+          <div>
+            <div class="slider-label">Tu salario bruto anual</div>
+            <div class="slider-amount" id="salaryDisplay">35.000 €</div>
+            <div class="slider-monthly" id="salaryMonthly">≈ 2.917 € / mes · 2.500 € / paga (14)</div>
+          </div>
+          <div class="presets">
+            <span class="toggle-label">Atajos:</span>
+            <button class="preset-btn" data-val="18000">18k</button>
+            <button class="preset-btn" data-val="26000">26k<small
+                style="font-size:9px;display:block;opacity:.6">mediana</small></button>
+            <button class="preset-btn" data-val="40000">40k</button>
+            <button class="preset-btn" data-val="60000">60k</button>
+            <button class="preset-btn" data-val="100000">100k</button>
+            <button class="preset-btn" data-val="200000">200k</button>
+          </div>
+        </div>
+        <div class="range-wrap">
+          <input type="range" id="salarySlider" min="0" max="300000" step="500" value="35000">
+        </div>
+        <div class="range-marks">
+          <div class="range-mark">0 €</div>
+          <div class="range-mark">26k€<small>mediana ES</small></div>
+          <div class="range-mark">100k€</div>
+          <div class="range-mark">200k€</div>
+          <div class="range-mark" style="text-align:right">300k€</div>
+        </div>
       </div>
-      <div class="map-tooltip" id="mapTooltip"></div>
+
+      <!-- MODE + PILLS -->
+      <div class="fade-up d2">
+        <div class="toggle-row">
+          <span class="toggle-label">Ver como:</span>
+          <div class="toggle">
+            <button class="toggle-opt active" id="togYear">Anual</button>
+            <button class="toggle-opt" id="togMonth12">Mensual (12)</button>
+            <button class="toggle-opt" id="togMonth14">Por paga (14)</button>
+          </div>
+        </div>
+        <div class="section-head">Comunidad Autónoma seleccionada</div>
+        <div class="community-pills" id="communityPills"></div>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-row fade-up d3" id="statsRow">
+        <div class="stat">
+          <div class="stat__label">Salario Bruto</div>
+          <div class="stat__val amber" id="sBruto">—</div>
+        </div>
+        <div class="stat stat--warn">
+          <div class="stat__label">Seg. Social</div>
+          <div class="stat__val red" id="sSS">—</div>
+          <div class="stat__sub">6,35%</div>
+        </div>
+        <div class="stat stat--warn">
+          <div class="stat__label">IRPF</div>
+          <div class="stat__val red" id="sIRPF">—</div>
+          <div class="stat__sub">Estado + CCAA</div>
+        </div>
+        <div class="stat stat--hi">
+          <div class="stat__label">💚 Neto Real</div>
+          <div class="stat__val green" id="sNeto">—</div>
+        </div>
+        <div class="stat">
+          <div class="stat__label">Tipo Efectivo</div>
+          <div class="stat__val blue" id="sTipoEf">—</div>
+          <div class="stat__sub">IRPF / bruto</div>
+        </div>
+        <div class="stat">
+          <div class="stat__label">Marginal</div>
+          <div class="stat__val" id="sMarginal" style="color:var(--purple)">—</div>
+          <div class="stat__sub">retención extra</div>
+        </div>
+      </div>
+
+      <!-- INSIGHT -->
+      <div class="insight fade-up d3" id="insightBox">
+        <div class="insight__ico">💡</div>
+        <div>
+          <div class="insight__title" id="insightTitle">…</div>
+          <div class="insight__body" id="insightBody">…</div>
+        </div>
+      </div>
+
+      <!-- VIRAL CARD -->
+      <div class="viral-card fade-up">
+        <div class="viral-quote" id="viralQuote">…</div>
+        <div class="viral-actions">
+          <button class="vbtn vbtn--x" onclick="shareTwitter()">
+            <svg width="13" height="13" fill="white" viewBox="0 0 24 24">
+              <path
+                d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.741l7.73-8.835L1.254 2.25H8.08l4.259 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+            Compartir en X
+          </button>
+          <button class="vbtn vbtn--ghost" onclick="copyText()">📋 Copiar texto</button>
+          <button class="vbtn vbtn--ghost" onclick="shareUrl()">🔗 URL compartible</button>
+        </div>
+      </div>
+
+      <!-- MAP -->
+      <div class="fade-up">
+        <div class="section-head">Mapa fiscal de España — neto para tu salario</div>
+        <div class="map-grid">
+          <div class="map-card">
+            <div class="map-card__title">¿Dónde te queda más dinero?</div>
+            <div class="map-card__sub">Verde = más neto · Rojo = menos neto · Haz clic para seleccionar comunidad</div>
+            <div id="spainMap"></div>
+            <div class="map-legend">
+              <span class="map-legend-txt">Menos neto</span>
+              <div class="map-legend-bar"></div>
+              <span class="map-legend-txt">Más neto</span>
+            </div>
+            <div class="map-tooltip" id="mapTooltip"></div>
+          </div>
+          <div class="map-card">
+            <div class="map-card__title">Ranking completo</div>
+            <div class="map-card__sub">Neto anual · Selecciona una comunidad</div>
+            <div class="rank-panel" id="rankPanel"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMPARE TRIO -->
+      <div class="fade-up">
+        <div class="section-head" style="margin-bottom:18px">Comparativa rápida para tu salario</div>
+        <div class="compare-trio" id="compareTrio"></div>
+      </div>
+
+      <!-- CHARTS ROW 1 -->
+      <div class="charts-2col fade-up">
+        <div class="chart-card">
+          <div class="chart-card__title">Bruto vs. Neto — curva completa</div>
+          <div class="chart-card__sub">De 0 a 300.000 € · Comunidad seleccionada</div>
+          <div class="chart-wrap"><canvas id="mainChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card__title">Desglose de tu nómina</div>
+          <div class="chart-card__sub">Dónde va cada euro bruto</div>
+          <div class="chart-wrap"><canvas id="donutChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW 2 -->
+      <div class="charts-row fade-up">
+        <div class="chart-card">
+          <div class="chart-card__title">¿Cuánto te queda de cada 100€ extra?</div>
+          <div class="chart-card__sub">Retorno neto marginal</div>
+          <div class="chart-wrap"><canvas id="marginalChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card__title">Tipo efectivo IRPF acumulado</div>
+          <div class="chart-card__sub">% de bruto que va a Hacienda</div>
+          <div class="chart-wrap"><canvas id="effectiveChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- BREAKDOWN TABLE -->
+      <div class="breakdown-card fade-up">
+        <div class="breakdown-title">🧮 Cálculo paso a paso — <span id="bdTitle">tu nómina</span></div>
+        <table class="bd-table" id="bdTable"></table>
+      </div>
+
+      <!-- RANKING CHART -->
+      <div class="ranking-card fade-up">
+        <div class="chart-card__title">Ranking de neto — todas las comunidades</div>
+        <div class="chart-card__sub" id="rankingSubtitle">Para el salario seleccionado</div>
+        <div class="ranking-wrap"><canvas id="rankingChart"></canvas></div>
+      </div>
+
     </div>
-    <div class="map-card">
-      <div class="map-card__title">Ranking completo</div>
-      <div class="map-card__sub">Neto anual · Selecciona una comunidad</div>
-      <div class="rank-panel" id="rankPanel"></div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p><strong>⚠️ Cálculo orientativo.</strong> Tramos IRPF 2026 (estatal + autonómico aproximados). No incluye
+        deducciones por hijos, hipoteca, discapacidad, planes de pensiones ni reducciones personales.</p>
+      <p>SS empleado: 6,35% (CC 4,70% + Desempleo 1,55% + FP 0,10%). Base máx.: ~56.000€/año. Navarra y País Vasco
+        tienen sistema foral propio y no se comparan.</p>
+      <p style="margin-top:8px;opacity:.4">Solo orientativo. Consulta a un asesor fiscal para cálculos precisos.</p>
+      <div
+        style="margin-top:24px; font-size: 13px; color: var(--muted2); display: flex; align-items: center; justify-content: center; gap: 16px;">
+        <span>Made with ❤️</span>
+        <a href="https://github.com/raulcarlomagno/irpf-bite" target="_blank"
+          style="color: var(--muted2); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: color .18s;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+          </svg>
+          github.com/raulcarlomagno/irpf-bite
+        </a>
+      </div>
     </div>
-  </div>
-</div>
+  </footer>
 
-<!-- COMPARE TRIO -->
-<div class="fade-up">
-  <div class="section-head" style="margin-bottom:18px">Comparativa rápida para tu salario</div>
-  <div class="compare-trio" id="compareTrio"></div>
-</div>
+  <script>
+    // ══════════════ FISCAL DATA 2026 ══════════════
 
-<!-- CHARTS ROW 1 -->
-<div class="charts-2col fade-up">
-  <div class="chart-card">
-    <div class="chart-card__title">Bruto vs. Neto — curva completa</div>
-    <div class="chart-card__sub">De 0 a 300.000 € · Comunidad seleccionada</div>
-    <div class="chart-wrap"><canvas id="mainChart"></canvas></div>
-  </div>
-  <div class="chart-card">
-    <div class="chart-card__title">Desglose de tu nómina</div>
-    <div class="chart-card__sub">Dónde va cada euro bruto</div>
-    <div class="chart-wrap"><canvas id="donutChart"></canvas></div>
-  </div>
-</div>
+    const STATE_BR = [
+      [0, 12450, .095], [12450, 20200, .12], [20200, 35200, .15],
+      [35200, 60000, .185], [60000, 300000, .225], [300000, Infinity, .245]
+    ];
+    const PERSONAL_MIN = 5550, SS_RATE = .0635, SS_MAX = 56000, OTHER_D = 2000;
 
-<!-- CHARTS ROW 2 -->
-<div class="charts-row fade-up">
-  <div class="chart-card">
-    <div class="chart-card__title">¿Cuánto te queda de cada 100€ extra?</div>
-    <div class="chart-card__sub">Retorno neto marginal</div>
-    <div class="chart-wrap"><canvas id="marginalChart"></canvas></div>
-  </div>
-  <div class="chart-card">
-    <div class="chart-card__title">Tipo efectivo IRPF acumulado</div>
-    <div class="chart-card__sub">% de bruto que va a Hacienda</div>
-    <div class="chart-wrap"><canvas id="effectiveChart"></canvas></div>
-  </div>
-</div>
+    const COMMUNITIES = [
+      {
+        id: 'madrid', name: 'Madrid', emoji: '🏛️', mapId: 'CM',
+        brackets: [[0, 13362, .085], [13362, 19004, .107], [19004, 35425, .128], [35425, 57320, .174], [57320, Infinity, .205]]
+      },
+      {
+        id: 'andalucia', name: 'Andalucía', emoji: '🌞', mapId: 'AN',
+        brackets: [[0, 13000, .095], [13000, 21000, .12], [21000, 35200, .15], [35200, 50000, .185], [50000, Infinity, .225]]
+      },
+      {
+        id: 'larioja', name: 'La Rioja', emoji: '🍇', mapId: 'RI',
+        brackets: [[0, 12450, .08], [12450, 20200, .106], [20200, 35200, .136], [35200, 40000, .178], [40000, 50000, .185], [50000, 60000, .19], [60000, 120000, .245], [120000, Infinity, .27]]
+      },
+      {
+        id: 'canarias', name: 'Canarias', emoji: '🌋', mapId: 'CN',
+        brackets: [[0, 12450, .09], [12450, 17707, .115], [17707, 33007, .14], [33007, 53407, .185], [53407, 90000, .235], [90000, 120000, .25], [120000, Infinity, .26]]
+      },
+      {
+        id: 'castillaleon', name: 'Castilla y León', emoji: '🏰', mapId: 'CL',
+        brackets: [[0, 12450, .09], [12450, 20200, .12], [20200, 35200, .14], [35200, 53407, .185], [53407, Infinity, .215]]
+      },
+      {
+        id: 'murcia', name: 'Murcia', emoji: '🌶️', mapId: 'MU',
+        brackets: [[0, 12450, .095], [12450, 20200, .112], [20200, 34000, .133], [34000, 60000, .179], [60000, Infinity, .225]]
+      },
+      {
+        id: 'galicia', name: 'Galicia', emoji: '🌊', mapId: 'GA',
+        brackets: [[0, 12985, .09], [12985, 21068, .1165], [21068, 35200, .149], [35200, 47600, .184], [60000, Infinity, .225]]
+      },
+      {
+        id: 'castillamancha', name: 'Castilla-La Mancha', emoji: '🌾', mapId: 'MC',
+        brackets: [[0, 12450, .095], [12450, 20200, .12], [20200, 35200, .15], [35200, 60000, .185], [60000, Infinity, .225]]
+      },
+      {
+        id: 'cantabria', name: 'Cantabria', emoji: '🌿', mapId: 'CB',
+        brackets: [[0, 13000, .085], [13000, 21000, .11], [21000, 35200, .145], [35200, 60000, .18], [60000, 90000, .225], [90000, Infinity, .245]]
+      },
+      {
+        id: 'aragon', name: 'Aragón', emoji: '🏞️', mapId: 'AR',
+        brackets: [[0, 13972.5, .095], [13972.5, 21210, .12], [21210, 36960, .15], [36960, 52500, .185], [52500, 60000, .205], [60000, 80000, .23], [80000, 90000, .24], [90000, 130000, .25], [130000, Infinity, .255]]
+      },
+      {
+        id: 'baleares', name: 'Baleares', emoji: '🏝️', mapId: 'IB',
+        brackets: [[0, 10000, .09], [10000, 18000, .1125], [18000, 30000, .1425], [30000, 48000, .175], [48000, 70000, .19], [70000, 90000, .2175], [90000, 120000, .2275], [120000, 175000, .2375], [175000, Infinity, .2475]]
+      },
+      {
+        id: 'asturias', name: 'Asturias', emoji: '⛰️', mapId: 'AS',
+        brackets: [[0, 12450, .10], [12450, 17707, .12], [17707, 33007, .14], [33007, 53407, .185], [53407, 70000, .215], [70000, 90000, .225], [90000, 175000, .25], [175000, Infinity, .255]]
+      },
+      {
+        id: 'valencia', name: 'C. Valenciana', emoji: '🍊', mapId: 'VC',
+        brackets: [[0, 12000, .09], [12000, 22000, .12], [22000, 32000, .15], [32000, 42000, .175], [42000, 52000, .20], [52000, 65000, .225], [62000, 72000, .25], [72000, 100000, .265], [100000, 150000, .275], [150000, 200000, .285], [200000, Infinity, .295]]
+      },
+      {
+        id: 'cataluna', name: 'Cataluña', emoji: '🏔️', mapId: 'CT',
+        brackets: [[0, 12450, .105], [12450, 17707, .12], [17707, 21000, .14], [21000, 33007, .15], [33007, 53407, .188], [53407, 90000, .215], [90000, 120000, .235], [120000, 175000, .245], [175000, Infinity, .255]]
+      },
+      {
+        id: 'extremadura', name: 'Extremadura', emoji: '🌿', mapId: 'EX',
+        brackets: [[0, 12450, .08], [12450, 20200, .10], [20200, 24200, .16], [24200, 35200, .175], [35200, 60000, .21], [60000, 80200, .235], [80200, 99220, .24], [99220, 120200, .245], [120200, Infinity, .25]]
+      },
+      { id: 'navarra', name: 'Navarra', emoji: '⚠️', mapId: 'NC', foral: true, brackets: [] },
+      { id: 'paisvasco', name: 'País Vasco', emoji: '⚠️', mapId: 'PV', foral: true, brackets: [] },
+    ];
 
-<!-- BREAKDOWN TABLE -->
-<div class="breakdown-card fade-up">
-  <div class="breakdown-title">🧮 Cálculo paso a paso — <span id="bdTitle">tu nómina</span></div>
-  <table class="bd-table" id="bdTable"></table>
-</div>
+    // ══════════════ CALCULATION ══════════════
 
-<!-- RANKING CHART -->
-<div class="ranking-card fade-up">
-  <div class="chart-card__title">Ranking de neto — todas las comunidades</div>
-  <div class="chart-card__sub" id="rankingSubtitle">Para el salario seleccionado</div>
-  <div class="ranking-wrap"><canvas id="rankingChart"></canvas></div>
-</div>
+    function calcSS(g) { return Math.min(g, SS_MAX) * SS_RATE }
+    function reducRend(rn) {
+      if (rn <= 15000) return 6498;
+      if (rn <= 21000) return Math.max(0, 6498 * (1 - (rn - 15000) / 6000));
+      return 0;
+    }
+    function applyBr(base, br) {
+      if (base <= 0 || !br.length) return 0;
+      let t = 0;
+      for (const [from, to, rate] of br) {
+        if (base <= from) break;
+        const top = to === Infinity ? base : Math.min(base, to);
+        t += (top - from) * rate;
+      }
+      return Math.max(0, t);
+    }
+    function calcIRPF(gross, cc) {
+      if (!cc || cc.foral) return null;
+      const ss = calcSS(gross);
+      const rn = Math.max(0, gross - ss - OTHER_D);
+      const reduc = reducRend(rn);
+      const base = Math.max(0, rn - reduc);
+      const stTax = applyBr(base, STATE_BR);
+      const autTax = applyBr(base, cc.brackets);
+      const stMin = STATE_BR[0][2];
+      const autMin = cc.brackets[0] ? cc.brackets[0][2] : 0;
+      const minDeduct = PERSONAL_MIN * (stMin + autMin);
+      const irpf = Math.max(0, stTax + autTax - minDeduct);
+      const net = Math.max(0, gross - ss - irpf);
+      return {
+        gross, ss, rn, reduc, base, stTax, autTax, minDeduct, irpf, net,
+        effIRPF: gross > 0 ? irpf / gross : 0,
+        totalRet: gross > 0 ? (ss + irpf) / gross : 0
+      };
+    }
+    function margKeep(gross, cc) {
+      const d = 500, a = calcIRPF(gross, cc), b = calcIRPF(gross + d, cc);
+      if (!a || !b) return null;
+      return (b.net - a.net) / d;
+    }
 
-</div></main>
+    // ══════════════ STATE ══════════════
 
-<footer>
-<div class="wrap">
-  <p><strong>⚠️ Cálculo orientativo.</strong> Tramos IRPF 2026 (estatal + autonómico aproximados). No incluye deducciones por hijos, hipoteca, discapacidad, planes de pensiones ni reducciones personales.</p>
-  <p>SS empleado: 6,35% (CC 4,70% + Desempleo 1,55% + FP 0,10%). Base máx.: ~56.000€/año. Navarra y País Vasco tienen sistema foral propio y no se comparan.</p>
-  <p style="margin-top:8px;opacity:.4">Solo orientativo. Consulta a un asesor fiscal para cálculos precisos.</p>
-  <div style="margin-top:24px; font-size: 13px; color: var(--muted2); display: flex; align-items: center; justify-content: center; gap: 16px;">
-    <span>Made with ❤️</span>
-    <a href="https://github.com/raulcarlomagno/irpf-bite" target="_blank" style="color: var(--muted2); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: color .18s;">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-      github.com/raulcarlomagno/irpf-bite
-    </a>
-  </div>
-</div>
-</footer>
+    let salary = 35000, cc = COMMUNITIES[0], dispMode = 'year';
+    let mainChart, donutChart, marginalChart, effectiveChart, rankingChart;
 
-<script>
-// ══════════════ FISCAL DATA 2026 ══════════════
+    // ══════════════ HELPERS ══════════════
 
-const STATE_BR = [
-  [0,12450,.095],[12450,20200,.12],[20200,35200,.15],
-  [35200,60000,.185],[60000,300000,.225],[300000,Infinity,.245]
-];
-const PERSONAL_MIN=5550, SS_RATE=.0635, SS_MAX=56000, OTHER_D=2000;
+    function fmt(n, d = 0) { return n.toLocaleString('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d }) + ' €' }
+    function pct(f, d = 1) { return (f * 100).toFixed(d) + '%' }
+    function dispF() { return dispMode === 'month12' ? 1 / 12 : dispMode === 'month14' ? 1 / 14 : 1 }
+    function dispSfx() { return dispMode === 'month12' ? '/mes' : dispMode === 'month14' ? '/paga' : '/año' }
 
-const COMMUNITIES=[
-  {id:'madrid',name:'Madrid',emoji:'🏛️',mapId:'CM',
-    brackets:[[0,13362,.085],[13362,19004,.107],[19004,35425,.128],[35425,57320,.174],[57320,Infinity,.205]]},
-  {id:'andalucia',name:'Andalucía',emoji:'🌞',mapId:'AN',
-    brackets:[[0,13000,.095],[13000,21000,.12],[21000,35200,.15],[35200,50000,.185],[50000,Infinity,.225]]},
-  {id:'larioja',name:'La Rioja',emoji:'🍇',mapId:'RI',
-    brackets:[[0,12450,.08],[12450,20200,.106],[20200,35200,.136],[35200,40000,.178],[40000,50000,.185],[50000,60000,.19],[60000,120000,.245],[120000,Infinity,.27]]},
-  {id:'canarias',name:'Canarias',emoji:'🌋',mapId:'CN',
-    brackets:[[0,12450,.09],[12450,17707,.115],[17707,33007,.14],[33007,53407,.185],[53407,90000,.235],[90000,120000,.25],[120000,Infinity,.26]]},
-  {id:'castillaleon',name:'Castilla y León',emoji:'🏰',mapId:'CL',
-    brackets:[[0,12450,.09],[12450,20200,.12],[20200,35200,.14],[35200,53407,.185],[53407,Infinity,.215]]},
-  {id:'murcia',name:'Murcia',emoji:'🌶️',mapId:'MU',
-    brackets:[[0,12450,.095],[12450,20200,.112],[20200,34000,.133],[34000,60000,.179],[60000,Infinity,.225]]},
-  {id:'galicia',name:'Galicia',emoji:'🌊',mapId:'GA',
-    brackets:[[0,12985,.09],[12985,21068,.1165],[21068,35200,.149],[35200,47600,.184],[60000,Infinity,.225]]},
-  {id:'castillamancha',name:'Castilla-La Mancha',emoji:'🌾',mapId:'MC',
-    brackets:[[0,12450,.095],[12450,20200,.12],[20200,35200,.15],[35200,60000,.185],[60000,Infinity,.225]]},
-  {id:'cantabria',name:'Cantabria',emoji:'🌿',mapId:'CB',
-    brackets:[[0,13000,.085],[13000,21000,.11],[21000,35200,.145],[35200,60000,.18],[60000,90000,.225],[90000,Infinity,.245]]},
-  {id:'aragon',name:'Aragón',emoji:'🏞️',mapId:'AR',
-    brackets:[[0,13972.5,.095],[13972.5,21210,.12],[21210,36960,.15],[36960,52500,.185],[52500,60000,.205],[60000,80000,.23],[80000,90000,.24],[90000,130000,.25],[130000,Infinity,.255]]},
-  {id:'baleares',name:'Baleares',emoji:'🏝️',mapId:'IB',
-    brackets:[[0,10000,.09],[10000,18000,.1125],[18000,30000,.1425],[30000,48000,.175],[48000,70000,.19],[70000,90000,.2175],[90000,120000,.2275],[120000,175000,.2375],[175000,Infinity,.2475]]},
-  {id:'asturias',name:'Asturias',emoji:'⛰️',mapId:'AS',
-    brackets:[[0,12450,.10],[12450,17707,.12],[17707,33007,.14],[33007,53407,.185],[53407,70000,.215],[70000,90000,.225],[90000,175000,.25],[175000,Infinity,.255]]},
-  {id:'valencia',name:'C. Valenciana',emoji:'🍊',mapId:'VC',
-    brackets:[[0,12000,.09],[12000,22000,.12],[22000,32000,.15],[32000,42000,.175],[42000,52000,.20],[52000,65000,.225],[62000,72000,.25],[72000,100000,.265],[100000,150000,.275],[150000,200000,.285],[200000,Infinity,.295]]},
-  {id:'cataluna',name:'Cataluña',emoji:'🏔️',mapId:'CT',
-    brackets:[[0,12450,.105],[12450,17707,.12],[17707,21000,.14],[21000,33007,.15],[33007,53407,.188],[53407,90000,.215],[90000,120000,.235],[120000,175000,.245],[175000,Infinity,.255]]},
-  {id:'extremadura',name:'Extremadura',emoji:'🌿',mapId:'EX',
-    brackets:[[0,12450,.08],[12450,20200,.10],[20200,24200,.16],[24200,35200,.175],[35200,60000,.21],[60000,80200,.235],[80200,99220,.24],[99220,120200,.245],[120200,Infinity,.25]]},
-  {id:'navarra',name:'Navarra',emoji:'⚠️',mapId:'NC',foral:true,brackets:[]},
-  {id:'paisvasco',name:'País Vasco',emoji:'⚠️',mapId:'PV',foral:true,brackets:[]},
-];
+    function lerp(t) {
+      if (t < .5) { const s = t * 2; return `rgba(${Math.round(255)},${Math.round(58 + (157 - 58) * s)},${Math.round(92 + (0 - 92) * s)},0.72)` }
+      const s = (t - .5) * 2; return `rgba(${Math.round(255 + (0 - 255) * s)},${Math.round(157 + (232 - 157) * s)},${Math.round(0 + (122 - 0) * s)},0.72)`;
+    }
+    function lerpStroke(t) {
+      if (t < .5) { const s = t * 2; return `rgb(${255},${Math.round(58 + (157 - 58) * s)},${Math.round(92 + (0 - 92) * s)})` }
+      const s = (t - .5) * 2; return `rgb(${Math.round(255 + (0 - 255) * s)},${Math.round(157 + (232 - 157) * s)},${Math.round(0 + (122 - 0) * s)})`;
+    }
 
-// ══════════════ CALCULATION ══════════════
+    // ══════════════ PILLS ══════════════
 
-function calcSS(g){return Math.min(g,SS_MAX)*SS_RATE}
-function reducRend(rn){
-  if(rn<=15000)return 6498;
-  if(rn<=21000)return Math.max(0,6498*(1-(rn-15000)/6000));
-  return 0;
-}
-function applyBr(base,br){
-  if(base<=0||!br.length)return 0;
-  let t=0;
-  for(const[from,to,rate]of br){
-    if(base<=from)break;
-    const top=to===Infinity?base:Math.min(base,to);
-    t+=(top-from)*rate;
-  }
-  return Math.max(0,t);
-}
-function calcIRPF(gross,cc){
-  if(!cc||cc.foral)return null;
-  const ss=calcSS(gross);
-  const rn=Math.max(0,gross-ss-OTHER_D);
-  const reduc=reducRend(rn);
-  const base=Math.max(0,rn-reduc);
-  const stTax=applyBr(base,STATE_BR);
-  const autTax=applyBr(base,cc.brackets);
-  const stMin=STATE_BR[0][2];
-  const autMin=cc.brackets[0]?cc.brackets[0][2]:0;
-  const minDeduct=PERSONAL_MIN*(stMin+autMin);
-  const irpf=Math.max(0,stTax+autTax-minDeduct);
-  const net=Math.max(0,gross-ss-irpf);
-  return{gross,ss,rn,reduc,base,stTax,autTax,minDeduct,irpf,net,
-    effIRPF:gross>0?irpf/gross:0,
-    totalRet:gross>0?(ss+irpf)/gross:0};
-}
-function margKeep(gross,cc){
-  const d=500,a=calcIRPF(gross,cc),b=calcIRPF(gross+d,cc);
-  if(!a||!b)return null;
-  return(b.net-a.net)/d;
-}
+    function renderPills() {
+      const el = document.getElementById('communityPills'); el.innerHTML = '';
+      COMMUNITIES.forEach(c => {
+        const b = document.createElement('button');
+        b.className = 'pill' + (c.id === cc.id ? ' active' : '') + (c.foral ? ' foral' : '');
+        b.textContent = c.emoji + ' ' + c.name;
+        b.onclick = () => {
+          if (c.foral) { alert('Navarra y País Vasco tienen Haciendas Forales propias con sistema tributario diferente. No se comparan directamente con el IRPF estatal.'); return }
+          cc = c; renderPills(); updateAll();
+        };
+        el.appendChild(b);
+      });
+    }
 
-// ══════════════ STATE ══════════════
+    // ══════════════ STATS ══════════════
 
-let salary=35000, cc=COMMUNITIES[0], dispMode='year';
-let mainChart,donutChart,marginalChart,effectiveChart,rankingChart;
+    function updateStats() {
+      const r = calcIRPF(salary, cc); if (!r) return;
+      const f = dispF(), s = dispSfx();
+      document.getElementById('sBruto').textContent = fmt(r.gross * f);
+      document.getElementById('sSS').textContent = '−' + fmt(r.ss * f);
+      document.getElementById('sIRPF').textContent = '−' + fmt(r.irpf * f);
+      document.getElementById('sNeto').textContent = fmt(r.net * f);
+      document.getElementById('sTipoEf').textContent = pct(r.effIRPF);
+      const mk = margKeep(salary, cc);
+      document.getElementById('sMarginal').textContent = mk !== null ? (((1 - mk) * 100).toFixed(0) + '% se pierde') : '-';
+      updateInsight(r, mk);
+      updateViralCard(r);
+    }
 
-// ══════════════ HELPERS ══════════════
+    function updateInsight(r, mk) {
+      if (mk === null) return;
+      const keep = Math.round(mk * 100), lose = 100 - keep;
+      let ico, title, body;
+      if (keep >= 72) { ico = '✅'; title = `De cada 100€ extra brutos, conservas ${keep}€ netos`; body = `Tipo marginal combinado (SS + IRPF): <strong>${lose}%</strong>. Aún merece la pena subir salario.` }
+      else if (keep >= 55) { ico = '⚠️'; title = `De cada 100€ extra, solo te quedan ${keep}€ netos`; body = `Hacienda y SS retienen <strong>${lose} céntimos</strong> de cada euro bruto adicional. Zona de rendimientos decrecientes.` }
+      else if (keep >= 45) { ico = '🔴'; title = `¡Zona crítica! Solo conservas ${keep}€ de cada 100€ extra`; body = `<strong>${lose}%</strong> de retención marginal. Muchos priorizan retribución flexible, plan de pensiones o beneficios en especie.` }
+      else { ico = '🚨'; title = `Rentabilidad marginal mínima: ${keep}€ de cada 100€ adicionales`; body = `Más del <strong>${lose}%</strong> de retención. La optimización fiscal (pensiones, stock options, retrib. flexible) es clave aquí.` }
+      document.querySelector('.insight__ico').textContent = ico;
+      document.getElementById('insightTitle').textContent = title;
+      document.getElementById('insightBody').innerHTML = body;
+    }
 
-function fmt(n,d=0){return n.toLocaleString('es-ES',{minimumFractionDigits:d,maximumFractionDigits:d})+' €'}
-function pct(f,d=1){return(f*100).toFixed(d)+'%'}
-function dispF(){return dispMode==='month12'?1/12:dispMode==='month14'?1/14:1}
-function dispSfx(){return dispMode==='month12'?'/mes':dispMode==='month14'?'/paga':'/año'}
+    // ══════════════ VIRAL CARD ══════════════
 
-function lerp(t){
-  if(t<.5){const s=t*2;return`rgba(${Math.round(255)},${Math.round(58+(157-58)*s)},${Math.round(92+(0-92)*s)},0.72)`}
-  const s=(t-.5)*2;return`rgba(${Math.round(255+(0-255)*s)},${Math.round(157+(232-157)*s)},${Math.round(0+(122-0)*s)},0.72)`;
-}
-function lerpStroke(t){
-  if(t<.5){const s=t*2;return`rgb(${255},${Math.round(58+(157-58)*s)},${Math.round(92+(0-92)*s)})`}
-  const s=(t-.5)*2;return`rgb(${Math.round(255+(0-255)*s)},${Math.round(157+(232-157)*s)},${Math.round(0+(122-0)*s)})`;
-}
+    function viralText() {
+      const r = calcIRPF(salary, cc); if (!r) return '';
+      const all = COMMUNITIES.filter(c => !c.foral).map(c => ({ c, r: calcIRPF(salary, c) })).sort((a, b) => b.r.net - a.r.net);
+      const best = all[0], mine = all.find(x => x.c.id === cc.id);
+      const diffBest = best.r.net - mine.r.net;
+      const mk = margKeep(salary, cc); const keep = mk !== null ? Math.round(mk * 100) : null;
+      let t = `Con ${fmt(salary)} brutos en ${cc.name}, te quedan ${fmt(r.net)} netos (${pct(r.totalRet)} al Estado).`;
+      if (diffBest > 500) t += ` En ${best.c.name} cobrarías ${fmt(diffBest)} más al año.`;
+      if (keep !== null && keep < 65) t += ` De cada 100€ extra brutos, solo conservas ${keep}€.`;
+      t += ` 🇪🇸 #IRPF`;
+      return t;
+    }
+    function updateViralCard(r) {
+      const all = COMMUNITIES.filter(c => !c.foral).map(c => ({ c, r: calcIRPF(salary, c) })).sort((a, b) => b.r.net - a.r.net);
+      const best = all[0], mine = all.find(x => x.c.id === cc.id);
+      const diffBest = best.r.net - mine.r.net;
+      const mk = margKeep(salary, cc); const keep = mk !== null ? Math.round(mk * 100) : null;
+      let q = `Cobras <em>${fmt(salary)} brutos</em> en ${cc.name} → te quedan <em>${fmt(r.net)} netos</em> (<em>${pct(r.totalRet)}</em> al Estado).`;
+      if (diffBest > 200) q += ` En <em>${best.c.name}</em> cobrarías <em>${fmt(diffBest)} más al año</em>.`;
+      if (keep !== null && keep < 65) q += ` Y de cada 100€ extra brutos, solo conservas <em>${keep}€</em>.`;
+      document.getElementById('viralQuote').innerHTML = q;
+    }
+    function shareTwitter() { window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(viralText() + '\n\n' + shareUrl()), '_blank') }
+    function copyText() { navigator.clipboard?.writeText(viralText()).then(() => alert('✅ Texto copiado')) }
+    function shareUrl() { const u = location.href.split('?')[0] + `?bruto=${salary}&cc=${cc.id}`; navigator.clipboard?.writeText(u).then(() => alert('🔗 URL copiada')); return u; }
 
-// ══════════════ PILLS ══════════════
+    // ══════════════ LEAFLET MAP ══════════════
 
-function renderPills(){
-  const el=document.getElementById('communityPills');el.innerHTML='';
-  COMMUNITIES.forEach(c=>{
-    const b=document.createElement('button');
-    b.className='pill'+(c.id===cc.id?' active':'')+(c.foral?' foral':'');
-    b.textContent=c.emoji+' '+c.name;
-    b.onclick=()=>{
-      if(c.foral){alert('Navarra y País Vasco tienen Haciendas Forales propias con sistema tributario diferente. No se comparan directamente con el IRPF estatal.');return}
-      cc=c;renderPills();updateAll();
+    let spainMap, geoJsonLayer;
+
+    // Map region codes to community IDs (SVG IDs: ES-AN, ES-AR, etc.)
+    const REGION_CODES = {
+      'ES-AN': { id: 'andalucia', name: 'Andalucía', emoji: '🌞' },
+      'ES-AR': { id: 'aragon', name: 'Aragón', emoji: '🏞️' },
+      'ES-AS': { id: 'asturias', name: 'Asturias', emoji: '⛰️' },
+      'ES-CB': { id: 'cantabria', name: 'Cantabria', emoji: '🌿' },
+      'ES-CM': { id: 'castillamancha', name: 'Castilla-La Mancha', emoji: '🌾' },
+      'ES-CL': { id: 'castillaleon', name: 'Castilla y León', emoji: '🏰' },
+      'ES-CT': { id: 'cataluna', name: 'Cataluña', emoji: '🏔️' },
+      'ES-EX': { id: 'extremadura', name: 'Extremadura', emoji: '🌿' },
+      'ES-GA': { id: 'galicia', name: 'Galicia', emoji: '🌊' },
+      'ES-IB': { id: 'baleares', name: 'Baleares', emoji: '🏝️' },
+      'ES-CN': { id: 'canarias', name: 'Canarias', emoji: '🌋' },
+      'ES-RI': { id: 'larioja', name: 'La Rioja', emoji: '🍇' },
+      'ES-MD': { id: 'madrid', name: 'Madrid', emoji: '🏛️' },
+      'ES-MC': { id: 'murcia', name: 'Murcia', emoji: '🌶️' },
+      'ES-NC': { id: 'navarra', name: 'Navarra', emoji: '⚠️', foral: true },
+      'ES-PV': { id: 'paisvasco', name: 'País Vasco', emoji: '⚠️', foral: true },
+      'ES-VC': { id: 'valencia', name: 'C. Valenciana', emoji: '🍊' }
     };
-    el.appendChild(b);
-  });
-}
 
-// ══════════════ STATS ══════════════
+    // ══════════════ SVG MAP (using spain.svg) ══════════════
 
-function updateStats(){
-  const r=calcIRPF(salary,cc);if(!r)return;
-  const f=dispF(),s=dispSfx();
-  document.getElementById('sBruto').textContent=fmt(r.gross*f);
-  document.getElementById('sSS').textContent='−'+fmt(r.ss*f);
-  document.getElementById('sIRPF').textContent='−'+fmt(r.irpf*f);
-  document.getElementById('sNeto').textContent=fmt(r.net*f);
-  document.getElementById('sTipoEf').textContent=pct(r.effIRPF);
-  const mk=margKeep(salary,cc);
-  document.getElementById('sMarginal').textContent=mk!==null?(((1-mk)*100).toFixed(0)+'% se pierde'):'-';
-  updateInsight(r,mk);
-  updateViralCard(r);
-}
+    // SVG bounding box from spain.svg
+    // Original: mapsvg:geoViewBox="-18.161674 43.794381 4.332045 27.636889"
+    // Format appears to be: minLon, maxLat, maxLon, minLat (west, north, east, south)
+    const SVG_GEO_BOUNDS = {
+      west: -18.161674,
+      south: 27.636889,
+      east: 4.332045,
+      north: 43.794381
+    };
+    const SVG_WIDTH = 612.91315;
+    const SVG_HEIGHT = 543.61902;
 
-function updateInsight(r,mk){
-  if(mk===null)return;
-  const keep=Math.round(mk*100),lose=100-keep;
-  let ico,title,body;
-  if(keep>=72){ico='✅';title=`De cada 100€ extra brutos, conservas ${keep}€ netos`;body=`Tipo marginal combinado (SS + IRPF): <strong>${lose}%</strong>. Aún merece la pena subir salario.`}
-  else if(keep>=55){ico='⚠️';title=`De cada 100€ extra, solo te quedan ${keep}€ netos`;body=`Hacienda y SS retienen <strong>${lose} céntimos</strong> de cada euro bruto adicional. Zona de rendimientos decrecientes.`}
-  else if(keep>=45){ico='🔴';title=`¡Zona crítica! Solo conservas ${keep}€ de cada 100€ extra`;body=`<strong>${lose}%</strong> de retención marginal. Muchos priorizan retribución flexible, plan de pensiones o beneficios en especie.`}
-  else{ico='🚨';title=`Rentabilidad marginal mínima: ${keep}€ de cada 100€ adicionales`;body=`Más del <strong>${lose}%</strong> de retención. La optimización fiscal (pensiones, stock options, retrib. flexible) es clave aquí.`}
-  document.querySelector('.insight__ico').textContent=ico;
-  document.getElementById('insightTitle').textContent=title;
-  document.getElementById('insightBody').innerHTML=body;
-}
+    // Convert lat/lon to SVG pixel coordinates
+    function latLonToSvgPixel(lat, lon) {
+      const x = ((lon - SVG_GEO_BOUNDS.west) / (SVG_GEO_BOUNDS.east - SVG_GEO_BOUNDS.west)) * SVG_WIDTH;
+      const y = ((SVG_GEO_BOUNDS.north - lat) / (SVG_GEO_BOUNDS.north - SVG_GEO_BOUNDS.south)) * SVG_HEIGHT;
+      return { x, y };
+    }
 
-// ══════════════ VIRAL CARD ══════════════
+    // Convert SVG path to Leaflet lat/lon polygon
+    function svgPathToLatLng(pathD) {
+      const contours = parseSvgPath(pathD);
+      // Leaflet L.polygon accepts both [[lat,lon],...] and [[[lat,lon],...],...]
+      return contours;
+    }
 
-function viralText(){
-  const r=calcIRPF(salary,cc);if(!r)return'';
-  const all=COMMUNITIES.filter(c=>!c.foral).map(c=>({c,r:calcIRPF(salary,c)})).sort((a,b)=>b.r.net-a.r.net);
-  const best=all[0],mine=all.find(x=>x.c.id===cc.id);
-  const diffBest=best.r.net-mine.r.net;
-  const mk=margKeep(salary,cc);const keep=mk!==null?Math.round(mk*100):null;
-  let t=`Con ${fmt(salary)} brutos en ${cc.name}, te quedan ${fmt(r.net)} netos (${pct(r.totalRet)} al Estado).`;
-  if(diffBest>500)t+=` En ${best.c.name} cobrarías ${fmt(diffBest)} más al año.`;
-  if(keep!==null&&keep<65)t+=` De cada 100€ extra brutos, solo conservas ${keep}€.`;
-  t+=` 🇪🇸 #IRPF`;
-  return t;
-}
-function updateViralCard(r){
-  const all=COMMUNITIES.filter(c=>!c.foral).map(c=>({c,r:calcIRPF(salary,c)})).sort((a,b)=>b.r.net-a.r.net);
-  const best=all[0],mine=all.find(x=>x.c.id===cc.id);
-  const diffBest=best.r.net-mine.r.net;
-  const mk=margKeep(salary,cc);const keep=mk!==null?Math.round(mk*100):null;
-  let q=`Cobras <em>${fmt(salary)} brutos</em> en ${cc.name} → te quedan <em>${fmt(r.net)} netos</em> (<em>${pct(r.totalRet)}</em> al Estado).`;
-  if(diffBest>200)q+=` En <em>${best.c.name}</em> cobrarías <em>${fmt(diffBest)} más al año</em>.`;
-  if(keep!==null&&keep<65)q+=` Y de cada 100€ extra brutos, solo conservas <em>${keep}€</em>.`;
-  document.getElementById('viralQuote').innerHTML=q;
-}
-function shareTwitter(){window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(viralText()+'\n\n'+shareUrl()),'_blank')}
-function copyText(){navigator.clipboard?.writeText(viralText()).then(()=>alert('✅ Texto copiado'))}
-function shareUrl(){const u=location.href.split('?')[0]+`?bruto=${salary}&cc=${cc.id}`;navigator.clipboard?.writeText(u).then(()=>alert('🔗 URL copiada'));return u;}
+    // Parse SVG path with proper handling of sub-contours and relative commands
+    function parseSvgPath(pathD) {
+      const allContours = [];
+      let currentContour = [];
+      let x = 0;
+      let y = 0;
+      let startX = 0;
+      let startY = 0;
 
-// ══════════════ LEAFLET MAP ══════════════
+      // Robust command splitter
+      const commands = pathD.match(/[a-zA-Z][^a-zA-Z]*/g) || [];
 
-let spainMap, geoJsonLayer;
+      for (const cmd of commands) {
+        const type = cmd[0];
+        const args = cmd.slice(1).trim()
+          .replace(/-/g, ' -')
+          .split(/[\s,]+/)
+          .filter(s => s.length > 0)
+          .map(Number);
 
-// Map region codes to community IDs (SVG IDs: ES-AN, ES-AR, etc.)
-const REGION_CODES = {
-  'ES-AN': { id: 'andalucia', name: 'Andalucía', emoji: '🌞' },
-  'ES-AR': { id: 'aragon', name: 'Aragón', emoji: '🏞️' },
-  'ES-AS': { id: 'asturias', name: 'Asturias', emoji: '⛰️' },
-  'ES-CB': { id: 'cantabria', name: 'Cantabria', emoji: '🌿' },
-  'ES-CM': { id: 'castillamancha', name: 'Castilla-La Mancha', emoji: '🌾' },
-  'ES-CL': { id: 'castillaleon', name: 'Castilla y León', emoji: '🏰' },
-  'ES-CT': { id: 'cataluna', name: 'Cataluña', emoji: '🏔️' },
-  'ES-EX': { id: 'extremadura', name: 'Extremadura', emoji: '🌿' },
-  'ES-GA': { id: 'galicia', name: 'Galicia', emoji: '🌊' },
-  'ES-IB': { id: 'baleares', name: 'Baleares', emoji: '🏝️' },
-  'ES-CN': { id: 'canarias', name: 'Canarias', emoji: '🌋' },
-  'ES-RI': { id: 'larioja', name: 'La Rioja', emoji: '🍇' },
-  'ES-MD': { id: 'madrid', name: 'Madrid', emoji: '🏛️' },
-  'ES-MC': { id: 'murcia', name: 'Murcia', emoji: '🌶️' },
-  'ES-NC': { id: 'navarra', name: 'Navarra', emoji: '⚠️', foral: true },
-  'ES-PV': { id: 'paisvasco', name: 'País Vasco', emoji: '⚠️', foral: true },
-  'ES-VC': { id: 'valencia', name: 'C. Valenciana', emoji: '🍊' }
-};
+        const lowerType = type.toLowerCase();
 
-// ══════════════ SVG MAP (using spain.svg) ══════════════
-
-// SVG bounding box from spain.svg
-// Original: mapsvg:geoViewBox="-18.161674 43.794381 4.332045 27.636889"
-// Format appears to be: minLon, maxLat, maxLon, minLat (west, north, east, south)
-const SVG_GEO_BOUNDS = {
-  west: -18.161674,
-  south: 27.636889,
-  east: 4.332045,
-  north: 43.794381
-};
-const SVG_WIDTH = 612.91315;
-const SVG_HEIGHT = 543.61902;
-
-// Convert lat/lon to SVG pixel coordinates
-function latLonToSvgPixel(lat, lon) {
-  const x = ((lon - SVG_GEO_BOUNDS.west) / (SVG_GEO_BOUNDS.east - SVG_GEO_BOUNDS.west)) * SVG_WIDTH;
-  const y = ((SVG_GEO_BOUNDS.north - lat) / (SVG_GEO_BOUNDS.north - SVG_GEO_BOUNDS.south)) * SVG_HEIGHT;
-  return { x, y };
-}
-
-// Convert SVG path to Leaflet lat/lon polygon
-function svgPathToLatLng(pathD) {
-  const contours = parseSvgPath(pathD);
-  // Leaflet L.polygon accepts both [[lat,lon],...] and [[[lat,lon],...],...]
-  return contours;
-}
-
-// Parse SVG path with proper handling of sub-contours and relative commands
-function parseSvgPath(pathD) {
-  const allContours = [];
-  let currentContour = [];
-  let x = 0;
-  let y = 0;
-  let startX = 0;
-  let startY = 0;
-  
-  // Robust command splitter
-  const commands = pathD.match(/[a-zA-Z][^a-zA-Z]*/g) || [];
-  
-  for (const cmd of commands) {
-    const type = cmd[0];
-    const args = cmd.slice(1).trim()
-                    .replace(/-/g, ' -')
-                    .split(/[\s,]+/)
-                    .filter(s => s.length > 0)
-                    .map(Number);
-    
-    const lowerType = type.toLowerCase();
-    
-    // Commands that take a single coordinate (or multiple single coordinates)
-    if (lowerType === 'h' || lowerType === 'v') {
-      for (let i = 0; i < args.length; i++) {
-        const val = args[i];
-        if (lowerType === 'h') {
-          x = (type === 'h') ? x + val : val;
-        } else {
-          y = (type === 'v') ? y + val : val;
-        }
-        addPoint();
-      }
-    } 
-    // Commands that take coordinate pairs
-    else if (lowerType === 'm' || lowerType === 'l') {
-      for (let i = 0; i < args.length; i += 2) {
-        if (i + 1 >= args.length) break;
-        const dx = args[i];
-        const dy = args[i+1];
-
-        if (lowerType === 'm' && i === 0) {
-          // New sub-contour
-          if (currentContour.length > 0) {
-            allContours.push(currentContour);
-          }
-          currentContour = [];
-          if (type === 'm') {
-            x += dx; y += dy;
-          } else {
-            x = dx; y = dy;
-          }
-          startX = x;
-          startY = y;
-        } else {
-          // Lines (implicit after M/m or explicit l/L)
-          if (type === 'm' || type === 'l') {
-            x += dx; y += dy;
-          } else {
-            x = dx; y = dy;
+        // Commands that take a single coordinate (or multiple single coordinates)
+        if (lowerType === 'h' || lowerType === 'v') {
+          for (let i = 0; i < args.length; i++) {
+            const val = args[i];
+            if (lowerType === 'h') {
+              x = (type === 'h') ? x + val : val;
+            } else {
+              y = (type === 'v') ? y + val : val;
+            }
+            addPoint();
           }
         }
-        addPoint();
-      }
-    }
-    // Close path
-    else if (lowerType === 'z') {
-      x = startX;
-      y = startY;
-      // Many SVG polygons don't repeat the start point at the end, 
-      // but Leaflet likes it or handles it. We don't strictly need to add it here
-      // as Leaflet's L.polygon closes automatically.
-      if (currentContour.length > 0) {
-        allContours.push(currentContour);
-        currentContour = [];
-      }
-    }
-  }
+        // Commands that take coordinate pairs
+        else if (lowerType === 'm' || lowerType === 'l') {
+          for (let i = 0; i < args.length; i += 2) {
+            if (i + 1 >= args.length) break;
+            const dx = args[i];
+            const dy = args[i + 1];
 
-  function addPoint() {
-    const lon = SVG_GEO_BOUNDS.west + (x / SVG_WIDTH) * (SVG_GEO_BOUNDS.east - SVG_GEO_BOUNDS.west);
-    const lat = SVG_GEO_BOUNDS.north - (y / SVG_HEIGHT) * (SVG_GEO_BOUNDS.north - SVG_GEO_BOUNDS.south);
-    currentContour.push([lat, lon]);
-  }
-  
-  if (currentContour.length > 0) {
-    allContours.push(currentContour);
-  }
-  
-  return allContours;
-}
-
-// Convert SVG pixel coordinates to Leaflet's simple CRS coordinates
-// SVG origin is top-left, but Leaflet uses bottom-left origin
-function parseSvgPathToSimple(pathD, svgWidth, svgHeight) {
-  const coords = [];
-  
-  // Split path into commands
-  const commands = pathD.match(/[a-zA-Z][^a-zA-Z]*/g) || [];
-  
-  let x = 0;
-  let y = 0;
-  let startX = 0;
-  let startY = 0;
-  
-  for (const cmd of commands) {
-    const type = cmd[0].toLowerCase();
-    const args = cmd.slice(1).trim().split(/[,\s]+/).map(Number).filter(n => !isNaN(n));
-    
-    switch (type) {
-      case 'm': // move to (relative)
-        x += args[0];
-        y += args[1];
-        startX = x;
-        startY = y;
-        // Convert: flip Y axis (Leaflet uses bottom-left as origin)
-        coords.push([svgHeight - y, x]);
-        break;
-      case 'l': // line to (relative)
-        x += args[0];
-        y += args[1];
-        coords.push([svgHeight - y, x]);
-        break;
-      case 'h': // horizontal line (relative)
-        x += args[0];
-        coords.push([svgHeight - y, x]);
-        break;
-      case 'v': // vertical line (relative)
-        y += args[0];
-        coords.push([svgHeight - y, x]);
-        break;
-      case 'z': // close path
-        if (coords.length > 0) {
+            if (lowerType === 'm' && i === 0) {
+              // New sub-contour
+              if (currentContour.length > 0) {
+                allContours.push(currentContour);
+              }
+              currentContour = [];
+              if (type === 'm') {
+                x += dx; y += dy;
+              } else {
+                x = dx; y = dy;
+              }
+              startX = x;
+              startY = y;
+            } else {
+              // Lines (implicit after M/m or explicit l/L)
+              if (type === 'm' || type === 'l') {
+                x += dx; y += dy;
+              } else {
+                x = dx; y = dy;
+              }
+            }
+            addPoint();
+          }
+        }
+        // Close path
+        else if (lowerType === 'z') {
           x = startX;
           y = startY;
-          coords.push(coords[0].slice()); // Close back to start
-        }
-        break;
-      // Handle absolute commands
-      case 'M': // move to (absolute)
-        x = args[0];
-        y = args[1];
-        startX = x;
-        startY = y;
-        coords.push([svgHeight - y, x]);
-        break;
-      case 'L': // line to (absolute)
-        x = args[0];
-        y = args[1];
-        coords.push([svgHeight - y, x]);
-        break;
-      case 'H': // horizontal line (absolute)
-        x = args[0];
-        coords.push([svgHeight - y, x]);
-        break;
-      case 'V': // vertical line (absolute)
-        y = args[0];
-        coords.push([svgHeight - y, x]);
-        break;
-    }
-  }
-  
-  return coords;
-}
-
-function buildMap() {
-  // Use geographic CRS (WGS84) - original approach
-  spainMap = L.map('spainMap', {
-    center: [40.2, -3.5],
-    zoom: 3,
-    zoomControl: true,
-    attributionControl: true
-  });
-  
-  // Add tile layer as background
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    subdomains: 'abcd',
-    maxZoom: 19
-  }).addTo(spainMap);
-  
-  // Create bounds from geoViewBox
-  const southWest = [SVG_GEO_BOUNDS.south, SVG_GEO_BOUNDS.west];
-  const northEast = [SVG_GEO_BOUNDS.north, SVG_GEO_BOUNDS.east];
-  const bounds = L.latLngBounds(southWest, northEast);
-  
-  // Add SVG as background image
-  L.imageOverlay('spain.svg', bounds).addTo(spainMap);
-  
-  // Set zoom and center manually instead of using fitBounds
-  spainMap.setZoom(6);
-  
-  // Create polygon layer for interactivity (on top of image)
-  geoJsonLayer = L.layerGroup().addTo(spainMap);
-  
-  // Load the SVG paths for interactivity
-  fetch('spain.svg')
-    .then(res => res.text())
-    .then(svgText => {
-      const parser = new DOMParser();
-      const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
-      const paths = svgDoc.querySelectorAll('path');
-      
-      // Polygons are created in geoJsonLayer which was initialized outside the fetch
-      
-      paths.forEach(path => {
-        const regionId = path.getAttribute('id');
-        const regionName = path.getAttribute('title');
-        const pathD = path.getAttribute('d');
-        
-        console.log('Found path:', regionId, regionName);
-        
-        if (!regionId || !REGION_CODES[regionId]) {
-          console.log('Skipping - no matching region code for:', regionId);
-          return;
-        }
-        
-        const community = REGION_CODES[regionId];
-        
-        // Convert SVG pixel coordinates to lat/lon using geoViewBox bounds
-        const allContours = parseSvgPath(pathD);
-        
-        // Check total points across all contours
-        const totalPoints = allContours.reduce((acc, c) => acc + c.length, 0);
-        
-        if (totalPoints < 3) {
-          console.log('Skipping - not enough coords for:', regionId);
-          return;
-        }
-        
-        const polygon = L.polygon(allContours, {
-          fillColor: community.foral ? 'rgba(255,255,255,0.05)' : '#ff0000',
-          weight: 2,
-          opacity: 1,
-          color: '#ffffff',
-          fillOpacity: 0.5
-        });
-        
-        // Add to layer with metadata
-        polygon.feature = { properties: { community: community, regionId: regionId } };
-        
-        if (!community.foral) {
-          const communityData = COMMUNITIES.find(c => c.id === community.id);
-          if (communityData) {
-            polygon.on('click', function() {
-              cc = communityData;
-              renderPills();
-              updateAll();
-            });
-            polygon.on('mouseover', function(e) {
-              console.log('Mouse over polygon:', community.name);
-              polygon.setStyle({
-                weight: 2,
-                color: 'rgba(255,255,255,0.8)',
-                fillOpacity: 0.8
-              });
-              showMapTipSvg(community, communityData);
-            });
-            polygon.on('mouseout', function(e) {
-              colorizeMapSvg();
-              document.getElementById('mapTooltip').style.display = 'none';
-            });
+          // Many SVG polygons don't repeat the start point at the end, 
+          // but Leaflet likes it or handles it. We don't strictly need to add it here
+          // as Leaflet's L.polygon closes automatically.
+          if (currentContour.length > 0) {
+            allContours.push(currentContour);
+            currentContour = [];
           }
         }
-        
-        console.log('Adding polygon for:', regionId);
-        polygon.addTo(geoJsonLayer);
+      }
+
+      function addPoint() {
+        const lon = SVG_GEO_BOUNDS.west + (x / SVG_WIDTH) * (SVG_GEO_BOUNDS.east - SVG_GEO_BOUNDS.west);
+        const lat = SVG_GEO_BOUNDS.north - (y / SVG_HEIGHT) * (SVG_GEO_BOUNDS.north - SVG_GEO_BOUNDS.south);
+        currentContour.push([lat, lon]);
+      }
+
+      if (currentContour.length > 0) {
+        allContours.push(currentContour);
+      }
+
+      return allContours;
+    }
+
+    // Convert SVG pixel coordinates to Leaflet's simple CRS coordinates
+    // SVG origin is top-left, but Leaflet uses bottom-left origin
+    function parseSvgPathToSimple(pathD, svgWidth, svgHeight) {
+      const coords = [];
+
+      // Split path into commands
+      const commands = pathD.match(/[a-zA-Z][^a-zA-Z]*/g) || [];
+
+      let x = 0;
+      let y = 0;
+      let startX = 0;
+      let startY = 0;
+
+      for (const cmd of commands) {
+        const type = cmd[0].toLowerCase();
+        const args = cmd.slice(1).trim().split(/[,\s]+/).map(Number).filter(n => !isNaN(n));
+
+        switch (type) {
+          case 'm': // move to (relative)
+            x += args[0];
+            y += args[1];
+            startX = x;
+            startY = y;
+            // Convert: flip Y axis (Leaflet uses bottom-left as origin)
+            coords.push([svgHeight - y, x]);
+            break;
+          case 'l': // line to (relative)
+            x += args[0];
+            y += args[1];
+            coords.push([svgHeight - y, x]);
+            break;
+          case 'h': // horizontal line (relative)
+            x += args[0];
+            coords.push([svgHeight - y, x]);
+            break;
+          case 'v': // vertical line (relative)
+            y += args[0];
+            coords.push([svgHeight - y, x]);
+            break;
+          case 'z': // close path
+            if (coords.length > 0) {
+              x = startX;
+              y = startY;
+              coords.push(coords[0].slice()); // Close back to start
+            }
+            break;
+          // Handle absolute commands
+          case 'M': // move to (absolute)
+            x = args[0];
+            y = args[1];
+            startX = x;
+            startY = y;
+            coords.push([svgHeight - y, x]);
+            break;
+          case 'L': // line to (absolute)
+            x = args[0];
+            y = args[1];
+            coords.push([svgHeight - y, x]);
+            break;
+          case 'H': // horizontal line (absolute)
+            x = args[0];
+            coords.push([svgHeight - y, x]);
+            break;
+          case 'V': // vertical line (absolute)
+            y = args[0];
+            coords.push([svgHeight - y, x]);
+            break;
+        }
+      }
+
+      return coords;
+    }
+
+    function buildMap() {
+      // Use geographic CRS (WGS84) - original approach
+      spainMap = L.map('spainMap', {
+        center: [40.2, -3.5],
+        zoom: 3,
+        zoomControl: true,
+        attributionControl: true
       });
-      
-      console.log('Total polygons added:', geoJsonLayer.getLayers().length);
-      
-      colorizeMapSvg();
-    })
-    .catch(err => console.error('Error loading SVG:', err));
-}
 
-function colorizeMapSvg() {
-  if (!geoJsonLayer) return;
-  
-  const all = COMMUNITIES.filter(c => !c.foral).map(c => ({c, r: calcIRPF(salary, c)}));
-  const nets = all.map(x => x.r.net), minN = Math.min(...nets), maxN = Math.max(...nets);
-  
-  geoJsonLayer.eachLayer(function(layer) {
-    const community = layer.feature?.properties?.community;
-    if (!community || community.foral) return;
-    
-    const communityInfo = COMMUNITIES.find(c => c.id === community.id);
-    if (!communityInfo) return;
-    
-    const r = calcIRPF(salary, communityInfo);
-    if (!r) return;
-    
-    const t = (r.net - minN) / (maxN - minN || 1);
-    const fill = lerp(t);
-    const isSelected = communityInfo.id === cc.id;
-    
-    layer.setStyle({
-      fillColor: fill,
-      weight: isSelected ? 2 : 1,
-      color: isSelected ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.15)',
-      fillOpacity: 0.7,
-      opacity: 0.5
-    });
-  });
-}
+      // Add tile layer as background
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19
+      }).addTo(spainMap);
 
-function showMapTipSvg(community, cc) {
-  const r = calcIRPF(salary, cc);
-  if (!r) return;
-  
-  const all = COMMUNITIES.filter(c => !c.foral).map(c => ({c, r: calcIRPF(salary, c)})).sort((a, b) => b.r.net - a.r.net);
-  const rank = all.findIndex(x => x.c.id === community.id) + 1;
-  
-  const tp = document.getElementById('mapTooltip');
-  tp.innerHTML = `<div class="mt-name">${community.emoji} ${community.name}</div>
+      // Create bounds from geoViewBox
+      const southWest = [SVG_GEO_BOUNDS.south, SVG_GEO_BOUNDS.west];
+      const northEast = [SVG_GEO_BOUNDS.north, SVG_GEO_BOUNDS.east];
+      const bounds = L.latLngBounds(southWest, northEast);
+
+      // Add SVG as background image
+      L.imageOverlay('spain.svg', bounds).addTo(spainMap);
+
+      // Set zoom and center manually instead of using fitBounds
+      spainMap.setZoom(6);
+
+      // Create polygon layer for interactivity (on top of image)
+      geoJsonLayer = L.layerGroup().addTo(spainMap);
+
+      // Load the SVG paths for interactivity
+      fetch('spain.svg')
+        .then(res => res.text())
+        .then(svgText => {
+          const parser = new DOMParser();
+          const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+          const paths = svgDoc.querySelectorAll('path');
+
+          // Polygons are created in geoJsonLayer which was initialized outside the fetch
+
+          paths.forEach(path => {
+            const regionId = path.getAttribute('id');
+            const regionName = path.getAttribute('title');
+            const pathD = path.getAttribute('d');
+
+            console.log('Found path:', regionId, regionName);
+
+            if (!regionId || !REGION_CODES[regionId]) {
+              console.log('Skipping - no matching region code for:', regionId);
+              return;
+            }
+
+            const community = REGION_CODES[regionId];
+            if (community.foral) return;
+
+            // Convert SVG pixel coordinates to lat/lon using geoViewBox bounds
+            const allContours = parseSvgPath(pathD);
+
+            // Check total points across all contours
+            const totalPoints = allContours.reduce((acc, c) => acc + c.length, 0);
+
+            if (totalPoints < 3) {
+              console.log('Skipping - not enough coords for:', regionId);
+              return;
+            }
+
+            const polygon = L.polygon(allContours, {
+              fillColor: community.foral ? 'rgba(255,255,255,0.05)' : '#ff0000',
+              weight: 2,
+              opacity: 1,
+              color: '#ffffff',
+              fillOpacity: 0.5
+            });
+
+            // Add to layer with metadata
+            polygon.feature = { properties: { community: community, regionId: regionId } };
+
+            if (!community.foral) {
+              const communityData = COMMUNITIES.find(c => c.id === community.id);
+              if (communityData) {
+                polygon.on('click', function () {
+                  cc = communityData;
+                  renderPills();
+                  updateAll();
+                });
+                polygon.on('mouseover', function (e) {
+                  console.log('Mouse over polygon:', community.name);
+                  polygon.setStyle({
+                    weight: 2,
+                    color: 'rgba(255,255,255,0.8)',
+                    fillOpacity: 0.8
+                  });
+                  showMapTipSvg(community, communityData);
+                });
+                polygon.on('mouseout', function (e) {
+                  colorizeMapSvg();
+                  document.getElementById('mapTooltip').style.display = 'none';
+                });
+              }
+            }
+
+            console.log('Adding polygon for:', regionId);
+            polygon.addTo(geoJsonLayer);
+          });
+
+          console.log('Total polygons added:', geoJsonLayer.getLayers().length);
+
+          colorizeMapSvg();
+        })
+        .catch(err => console.error('Error loading SVG:', err));
+    }
+
+    function colorizeMapSvg() {
+      if (!geoJsonLayer) return;
+
+      const all = COMMUNITIES.filter(c => !c.foral).map(c => ({ c, r: calcIRPF(salary, c) }));
+      const nets = all.map(x => x.r.net), minN = Math.min(...nets), maxN = Math.max(...nets);
+
+      geoJsonLayer.eachLayer(function (layer) {
+        const community = layer.feature?.properties?.community;
+        if (!community || community.foral) return;
+
+        const communityInfo = COMMUNITIES.find(c => c.id === community.id);
+        if (!communityInfo) return;
+
+        const r = calcIRPF(salary, communityInfo);
+        if (!r) return;
+
+        const t = (r.net - minN) / (maxN - minN || 1);
+        const fill = lerp(t);
+        const isSelected = communityInfo.id === cc.id;
+
+        layer.setStyle({
+          fillColor: fill,
+          weight: isSelected ? 2 : 1,
+          color: isSelected ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.15)',
+          fillOpacity: 0.7,
+          opacity: 0.5
+        });
+      });
+    }
+
+    function showMapTipSvg(community, cc) {
+      const r = calcIRPF(salary, cc);
+      if (!r) return;
+
+      const all = COMMUNITIES.filter(c => !c.foral).map(c => ({ c, r: calcIRPF(salary, c) })).sort((a, b) => b.r.net - a.r.net);
+      const rank = all.findIndex(x => x.c.id === community.id) + 1;
+
+      const tp = document.getElementById('mapTooltip');
+      tp.innerHTML = `<div class="mt-name">${community.emoji} ${community.name}</div>
     <div class="mt-row"><span>Bruto anual</span><strong>${fmt(r.gross)}</strong></div>
     <div class="mt-row"><span>Neto anual</span><strong style="color:var(--green)">${fmt(r.net)}</strong></div>
     <div class="mt-row"><span>IRPF</span><strong style="color:var(--red)">−${fmt(r.irpf)}</strong></div>
     <div class="mt-row"><span>Seg. Social</span><strong style="color:var(--red)">−${fmt(r.ss)}</strong></div>
     <div class="mt-row"><span>Tipo efectivo</span><strong>${pct(r.effIRPF)}</strong></div>
     <div class="mt-row"><span>Ranking</span><strong>#${rank} de 15</strong></div>`;
-  
-  // Find the layer for this community
-  let targetLayer = null;
-  geoJsonLayer.eachLayer(function(layer) {
-    if (layer.feature?.properties?.community?.id === community.id) {
-      targetLayer = layer;
+
+      // Find the layer for this community
+      let targetLayer = null;
+      geoJsonLayer.eachLayer(function (layer) {
+        if (layer.feature?.properties?.community?.id === community.id) {
+          targetLayer = layer;
+        }
+      });
+
+      if (!targetLayer) {
+        console.log('No layer found for:', community.id);
+        tp.style.display = 'none';
+        return;
+      }
+
+      const bounds = targetLayer.getBounds();
+      const center = bounds.getCenter();
+      const point = spainMap.latLngToContainerPoint(center);
+
+      // Position tooltip relative to the map container
+      const mapEl = document.getElementById('spainMap');
+      const mapRect = mapEl.getBoundingClientRect();
+
+      let x = point.x + 14, y = point.y - 20;
+      // Adjust if would go outside the map
+      if (x + 200 > mapRect.width) x = point.x - 220;
+      if (y < 0) y = 10;
+      if (y + 200 > mapRect.height) y = mapRect.height - 210;
+
+      // Make sure it's positioned correctly
+      tp.style.position = 'absolute';
+      tp.style.left = x + 'px';
+      tp.style.top = y + 'px';
+      tp.style.zIndex = '1000';
+      tp.style.display = 'block';
+      console.log('Showing tooltip for:', community.name, 'at', x, y);
     }
-  });
-  
-  if (!targetLayer) {
-    console.log('No layer found for:', community.id);
-    tp.style.display = 'none';
-    return;
-  }
-  
-  const bounds = targetLayer.getBounds();
-  const center = bounds.getCenter();
-  const point = spainMap.latLngToContainerPoint(center);
-  
-  // Position tooltip relative to the map container
-  const mapEl = document.getElementById('spainMap');
-  const mapRect = mapEl.getBoundingClientRect();
-  
-  let x = point.x + 14, y = point.y - 20;
-  // Adjust if would go outside the map
-  if (x + 200 > mapRect.width) x = point.x - 220;
-  if (y < 0) y = 10;
-  if (y + 200 > mapRect.height) y = mapRect.height - 210;
-  
-  // Make sure it's positioned correctly
-  tp.style.position = 'absolute';
-  tp.style.left = x + 'px';
-  tp.style.top = y + 'px';
-  tp.style.zIndex = '1000';
-  tp.style.display = 'block';
-  console.log('Showing tooltip for:', community.name, 'at', x, y);
-}
 
-// Keep old functions for compatibility but they'll be replaced
-function groupByCommunity(geojson) { return geojson; }
-function onEachFeature(feature, layer) {}
-function defaultStyle(feature) { return {}; }
-function showMapTip(feature, community) {}
-function colorizeMap() { colorizeMapSvg(); }
+    // Keep old functions for compatibility but they'll be replaced
+    function groupByCommunity(geojson) { return geojson; }
+    function onEachFeature(feature, layer) { }
+    function defaultStyle(feature) { return {}; }
+    function showMapTip(feature, community) { }
+    function colorizeMap() { colorizeMapSvg(); }
 
-// ══════════════ RANK PANEL ══════════════
+    // ══════════════ RANK PANEL ══════════════
 
-function updateRankPanel(){
-  const all=COMMUNITIES.filter(c=>!c.foral).map(c=>({c,r:calcIRPF(salary,c)})).sort((a,b)=>b.r.net-a.r.net);
-  const maxN=all[0].r.net,minN=all[all.length-1].r.net;
-  const panel=document.getElementById('rankPanel');panel.innerHTML='';
-  all.forEach(({c,r},i)=>{
-    const t=(r.net-minN)/(maxN-minN||1);
-    const col=lerpStroke(t);
-    const item=document.createElement('div');
-    item.className='rp-item'+(c.id===cc.id?' active':'');
-    item.innerHTML=`<div class="rp-rank">#${i+1}</div>
+    function updateRankPanel() {
+      const all = COMMUNITIES.filter(c => !c.foral).map(c => ({ c, r: calcIRPF(salary, c) })).sort((a, b) => b.r.net - a.r.net);
+      const maxN = all[0].r.net, minN = all[all.length - 1].r.net;
+      const panel = document.getElementById('rankPanel'); panel.innerHTML = '';
+      all.forEach(({ c, r }, i) => {
+        const t = (r.net - minN) / (maxN - minN || 1);
+        const col = lerpStroke(t);
+        const item = document.createElement('div');
+        item.className = 'rp-item' + (c.id === cc.id ? ' active' : '');
+        item.innerHTML = `<div class="rp-rank">#${i + 1}</div>
       <div class="rp-name">${c.emoji} ${c.name}</div>
-      <div class="rp-bar-wrap"><div class="rp-bar" style="width:${(r.net/maxN*100).toFixed(0)}%;background:${col.replace('rgb(','rgba(').replace(')',',0.7)')}"></div></div>
+      <div class="rp-bar-wrap"><div class="rp-bar" style="width:${(r.net / maxN * 100).toFixed(0)}%;background:${col.replace('rgb(', 'rgba(').replace(')', ',0.7)')}"></div></div>
       <div class="rp-val" style="color:${col}">${fmt(r.net)}</div>`;
-    item.onclick=()=>{cc=c;renderPills();updateAll()};
-    panel.appendChild(item);
-  });
-}
+        item.onclick = () => { cc = c; renderPills(); updateAll() };
+        panel.appendChild(item);
+      });
+    }
 
-// ══════════════ COMPARE ══════════════
+    // ══════════════ COMPARE ══════════════
 
-function updateCompareTrio(){
-  const all=COMMUNITIES.filter(c=>!c.foral).map(c=>({c,...calcIRPF(salary,c)})).sort((a,b)=>b.net-a.net);
-  const best=all[0],worst=all[all.length-1],mine=all.find(x=>x.c.id===cc.id);
-  const f=dispF(),sfx=dispSfx();
-  document.getElementById('compareTrio').innerHTML=`
-    <div class="compare-card best"><div class="cc-tag best">✅ Más neto</div><div class="cc-name">${best.c.emoji} ${best.c.name}</div><div class="cc-net" style="color:var(--green)">${fmt(best.net*f)}<small style="font-size:11px;color:var(--muted2)">${sfx}</small></div><div class="cc-detail">Tipo ef.: ${pct(best.effIRPF)}</div></div>
-    <div class="compare-card mine"><div class="cc-tag mine">📍 Tu comunidad</div><div class="cc-name">${mine.c.emoji} ${mine.c.name}</div><div class="cc-net" style="color:var(--amber)">${fmt(mine.net*f)}<small style="font-size:11px;color:var(--muted2)">${sfx}</small></div><div class="cc-detail">Tipo ef.: ${pct(mine.effIRPF)}</div></div>
-    <div class="compare-card worst"><div class="cc-tag worst">❌ Menos neto</div><div class="cc-name">${worst.c.emoji} ${worst.c.name}</div><div class="cc-net" style="color:var(--red)">${fmt(worst.net*f)}<small style="font-size:11px;color:var(--muted2)">${sfx}</small></div><div class="cc-detail">Dif. vs mejor: ${fmt((best.net-worst.net)*f)}</div></div>
+    function updateCompareTrio() {
+      const all = COMMUNITIES.filter(c => !c.foral).map(c => ({ c, ...calcIRPF(salary, c) })).sort((a, b) => b.net - a.net);
+      const best = all[0], worst = all[all.length - 1], mine = all.find(x => x.c.id === cc.id);
+      const f = dispF(), sfx = dispSfx();
+      document.getElementById('compareTrio').innerHTML = `
+    <div class="compare-card best"><div class="cc-tag best">✅ Más neto</div><div class="cc-name">${best.c.emoji} ${best.c.name}</div><div class="cc-net" style="color:var(--green)">${fmt(best.net * f)}<small style="font-size:11px;color:var(--muted2)">${sfx}</small></div><div class="cc-detail">Tipo ef.: ${pct(best.effIRPF)}</div></div>
+    <div class="compare-card mine"><div class="cc-tag mine">📍 Tu comunidad</div><div class="cc-name">${mine.c.emoji} ${mine.c.name}</div><div class="cc-net" style="color:var(--amber)">${fmt(mine.net * f)}<small style="font-size:11px;color:var(--muted2)">${sfx}</small></div><div class="cc-detail">Tipo ef.: ${pct(mine.effIRPF)}</div></div>
+    <div class="compare-card worst"><div class="cc-tag worst">❌ Menos neto</div><div class="cc-name">${worst.c.emoji} ${worst.c.name}</div><div class="cc-net" style="color:var(--red)">${fmt(worst.net * f)}<small style="font-size:11px;color:var(--muted2)">${sfx}</small></div><div class="cc-detail">Dif. vs mejor: ${fmt((best.net - worst.net) * f)}</div></div>
   `;
-}
+    }
 
-// ══════════════ BREAKDOWN TABLE ══════════════
+    // ══════════════ BREAKDOWN TABLE ══════════════
 
-function updateBreakdown(){
-  const r=calcIRPF(salary,cc);if(!r)return;
-  document.getElementById('bdTitle').textContent=`${fmt(salary)} brutos · ${cc.name}`;
-  let rows=`
+    function updateBreakdown() {
+      const r = calcIRPF(salary, cc); if (!r) return;
+      document.getElementById('bdTitle').textContent = `${fmt(salary)} brutos · ${cc.name}`;
+      let rows = `
     <tr><td class="bd-label"><strong>Salario Bruto</strong></td><td class="bd-formula">Punto de partida</td><td class="bd-val amb">${fmt(r.gross)}</td></tr>
-    <tr><td class="bd-label">Cotización SS (empleado)</td><td class="bd-formula">Base ${fmt(Math.min(r.gross,SS_MAX))} × 6,35%</td><td class="bd-val neg">−${fmt(r.ss)}</td></tr>
+    <tr><td class="bd-label">Cotización SS (empleado)</td><td class="bd-formula">Base ${fmt(Math.min(r.gross, SS_MAX))} × 6,35%</td><td class="bd-val neg">−${fmt(r.ss)}</td></tr>
     <tr><td class="bd-label">Gastos deducibles</td><td class="bd-formula">Fijos (otros gastos deducibles)</td><td class="bd-val neg">−${fmt(OTHER_D)}</td></tr>
     <tr><td class="bd-label">Rend. neto del trabajo</td><td class="bd-formula">Bruto − SS − Gastos</td><td class="bd-val">${fmt(r.rn)}</td></tr>
     <tr><td class="bd-label">Reducción rend. trabajo</td><td class="bd-formula">Según nivel de renta (máx. 6.498€)</td><td class="bd-val neg">−${fmt(r.reduc)}</td></tr>
     <tr><td class="bd-label"><strong>Base imponible general</strong></td><td class="bd-formula">Base sobre la que se aplican tramos</td><td class="bd-val bl">${fmt(r.base)}</td></tr>`;
 
-  // State tax tramos
-  rows+=`<tr><td class="bd-label">IRPF estatal — tramos</td><td class="bd-formula"></td><td class="bd-val neg">−${fmt(r.stTax)}</td></tr>`;
-  STATE_BR.forEach(([from,to,rate])=>{
-    if(r.base<=from)return;
-    const top=to===Infinity?r.base:Math.min(r.base,to);
-    const chunk=top-from;
-    rows+=`<tr class="bd-sub"><td class="bd-label">Tramo ${fmt(from)}–${to===Infinity?'∞':fmt(to)}</td><td class="bd-formula">${fmt(chunk)} × ${pct(rate,0)}</td><td class="bd-val neg">−${fmt(chunk*rate)}</td></tr>`;
-  });
+      // State tax tramos
+      rows += `<tr><td class="bd-label">IRPF estatal — tramos</td><td class="bd-formula"></td><td class="bd-val neg">−${fmt(r.stTax)}</td></tr>`;
+      STATE_BR.forEach(([from, to, rate]) => {
+        if (r.base <= from) return;
+        const top = to === Infinity ? r.base : Math.min(r.base, to);
+        const chunk = top - from;
+        rows += `<tr class="bd-sub"><td class="bd-label">Tramo ${fmt(from)}–${to === Infinity ? '∞' : fmt(to)}</td><td class="bd-formula">${fmt(chunk)} × ${pct(rate, 0)}</td><td class="bd-val neg">−${fmt(chunk * rate)}</td></tr>`;
+      });
 
-  rows+=`<tr><td class="bd-label">IRPF autonómico (${cc.name})</td><td class="bd-formula">Tramos propios de la comunidad</td><td class="bd-val neg">−${fmt(r.autTax)}</td></tr>`;
-  rows+=`<tr><td class="bd-label">Deducción mínimo personal</td><td class="bd-formula">${fmt(PERSONAL_MIN)} × (tipo estatal + autonómico)</td><td class="bd-val" style="color:var(--green)">+${fmt(r.minDeduct)}</td></tr>`;
-  rows+=`<tr><td class="bd-label"><strong>IRPF total a pagar</strong></td><td class="bd-formula">Tipo efectivo: ${pct(r.effIRPF)}</td><td class="bd-val neg">−${fmt(r.irpf)}</td></tr>`;
-  rows+=`<tr class="bd-total"><td class="bd-label">💚 SALARIO NETO ANUAL</td><td class="bd-formula">${pct(r.totalRet)} al Estado</td><td class="bd-val pos">${fmt(r.net)}</td></tr>`;
+      rows += `<tr><td class="bd-label">IRPF autonómico (${cc.name})</td><td class="bd-formula">Tramos propios de la comunidad</td><td class="bd-val neg">−${fmt(r.autTax)}</td></tr>`;
+      rows += `<tr><td class="bd-label">Deducción mínimo personal</td><td class="bd-formula">${fmt(PERSONAL_MIN)} × (tipo estatal + autonómico)</td><td class="bd-val" style="color:var(--green)">+${fmt(r.minDeduct)}</td></tr>`;
+      rows += `<tr><td class="bd-label"><strong>IRPF total a pagar</strong></td><td class="bd-formula">Tipo efectivo: ${pct(r.effIRPF)}</td><td class="bd-val neg">−${fmt(r.irpf)}</td></tr>`;
+      rows += `<tr class="bd-total"><td class="bd-label">💚 SALARIO NETO ANUAL</td><td class="bd-formula">${pct(r.totalRet)} al Estado</td><td class="bd-val pos">${fmt(r.net)}</td></tr>`;
 
-  document.getElementById('bdTable').innerHTML=rows;
-}
+      document.getElementById('bdTable').innerHTML = rows;
+    }
 
-// ══════════════ CHARTS ══════════════
+    // ══════════════ CHARTS ══════════════
 
-function initMainChart(){
-  const ctx=document.getElementById('mainChart').getContext('2d');
-  const g=ctx.createLinearGradient(0,0,0,250);g.addColorStop(0,'rgba(0,232,122,.28)');g.addColorStop(1,'rgba(0,232,122,.02)');
-  mainChart=new Chart(ctx,{type:'line',data:{datasets:[
-    {label:'Bruto',data:[],borderColor:'rgba(255,255,255,.15)',backgroundColor:'transparent',borderWidth:1.5,borderDash:[6,4],pointRadius:0,tension:.4,fill:false,order:3},
-    {label:'Neto',data:[],borderColor:'#00e87a',backgroundColor:g,borderWidth:2.5,pointRadius:0,tension:.4,fill:true,order:1},
-    {label:'Tu salario',data:[],type:'scatter',borderColor:'#fff',backgroundColor:'#fff',pointRadius:7,order:0}
-  ]},options:{responsive:true,maintainAspectRatio:false,
-    interaction:{intersect:false,mode:'index'},
-    plugins:{legend:{display:true,labels:{color:'rgba(255,255,255,.4)',font:{size:11,family:"'DM Mono'"},boxHeight:2,usePointStyle:true}},
-      tooltip:{backgroundColor:'#0d1024',borderColor:'rgba(255,200,60,.2)',borderWidth:1,padding:12,
-        callbacks:{title:i=>'Bruto: '+fmt(i[0].parsed.x),label:i=>i.datasetIndex<2?' '+i.dataset.label+': '+fmt(i.parsed.y):null,filter:i=>i.datasetIndex<2}}},
-    scales:{x:{type:'linear',min:0,max:300000,ticks:{color:'rgba(255,255,255,.2)',font:{size:10,family:"'DM Mono'"},callback:v=>v>=1000?(v/1000)+'k':v,maxTicksLimit:8},grid:{color:'rgba(255,255,255,.04)'}},
-      y:{ticks:{color:'rgba(255,255,255,.2)',font:{size:10,family:"'DM Mono'"},callback:v=>(v/1000)+'k',maxTicksLimit:6},grid:{color:'rgba(255,255,255,.04)'}}}}});
-}
-function updateMainChart(mode='none'){
-  const pts=[];for(let g=0;g<=300000;g+=2000){const r=calcIRPF(g,cc);if(r)pts.push(r)}
-  mainChart.data.datasets[0].data=pts.map(p=>({x:p.gross,y:p.gross}));
-  mainChart.data.datasets[1].data=pts.map(p=>({x:p.gross,y:p.net}));
-  const r=calcIRPF(salary,cc);
-  mainChart.data.datasets[2].data=r?[{x:r.gross,y:r.net}]:[];
-  mainChart.update(mode);
-}
+    function initMainChart() {
+      const ctx = document.getElementById('mainChart').getContext('2d');
+      const g = ctx.createLinearGradient(0, 0, 0, 250); g.addColorStop(0, 'rgba(0,232,122,.28)'); g.addColorStop(1, 'rgba(0,232,122,.02)');
+      mainChart = new Chart(ctx, {
+        type: 'line', data: {
+          datasets: [
+            { label: 'Bruto', data: [], borderColor: 'rgba(255,255,255,.15)', backgroundColor: 'transparent', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, tension: .4, fill: false, order: 3 },
+            { label: 'Neto', data: [], borderColor: '#00e87a', backgroundColor: g, borderWidth: 2.5, pointRadius: 0, tension: .4, fill: true, order: 1 },
+            { label: 'Tu salario', data: [], type: 'scatter', borderColor: '#fff', backgroundColor: '#fff', pointRadius: 7, order: 0 }
+          ]
+        }, options: {
+          responsive: true, maintainAspectRatio: false,
+          interaction: { intersect: false, mode: 'index' },
+          plugins: {
+            legend: { display: true, labels: { color: 'rgba(255,255,255,.4)', font: { size: 11, family: "'DM Mono'" }, boxHeight: 2, usePointStyle: true } },
+            tooltip: {
+              backgroundColor: '#0d1024', borderColor: 'rgba(255,200,60,.2)', borderWidth: 1, padding: 12,
+              callbacks: { title: i => 'Bruto: ' + fmt(i[0].parsed.x), label: i => i.datasetIndex < 2 ? ' ' + i.dataset.label + ': ' + fmt(i.parsed.y) : null, filter: i => i.datasetIndex < 2 }
+            }
+          },
+          scales: {
+            x: { type: 'linear', min: 0, max: 300000, ticks: { color: 'rgba(255,255,255,.2)', font: { size: 10, family: "'DM Mono'" }, callback: v => v >= 1000 ? (v / 1000) + 'k' : v, maxTicksLimit: 8 }, grid: { color: 'rgba(255,255,255,.04)' } },
+            y: { ticks: { color: 'rgba(255,255,255,.2)', font: { size: 10, family: "'DM Mono'" }, callback: v => (v / 1000) + 'k', maxTicksLimit: 6 }, grid: { color: 'rgba(255,255,255,.04)' } }
+          }
+        }
+      });
+    }
+    function updateMainChart(mode = 'none') {
+      const pts = []; for (let g = 0; g <= 300000; g += 2000) { const r = calcIRPF(g, cc); if (r) pts.push(r) }
+      mainChart.data.datasets[0].data = pts.map(p => ({ x: p.gross, y: p.gross }));
+      mainChart.data.datasets[1].data = pts.map(p => ({ x: p.gross, y: p.net }));
+      const r = calcIRPF(salary, cc);
+      mainChart.data.datasets[2].data = r ? [{ x: r.gross, y: r.net }] : [];
+      mainChart.update(mode);
+    }
 
-function initDonutChart(){
-  const ctx=document.getElementById('donutChart').getContext('2d');
-  donutChart=new Chart(ctx,{type:'doughnut',data:{labels:['Neto (tuyo)','IRPF','Seg. Social'],
-    datasets:[{data:[0,0,0],backgroundColor:['rgba(0,232,122,.7)','rgba(255,58,92,.7)','rgba(255,200,60,.55)'],borderColor:['#00e87a','#ff3a5c','#ffc83d'],borderWidth:2,hoverOffset:8}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
-      layout:{padding:15},
-      interaction:{intersect:false},
-      plugins:{legend:{position:'bottom',labels:{color:'rgba(255,255,255,.45)',font:{size:11,family:"'DM Mono'"},padding:12,boxWidth:12}},
-        tooltip:{backgroundColor:'#0d1024',borderColor:'rgba(255,200,60,.2)',borderWidth:1,padding:12,
-          callbacks:{label:i=>`  ${i.label}: ${fmt(i.parsed)} (${pct(i.parsed/i.dataset.data.reduce((a,b)=>a+b,0))})`}}}}});
-}
-function updateDonutChart(mode='none'){
-  const r=calcIRPF(salary,cc);if(!r)return;
-  donutChart.data.datasets[0].data=[r.net,r.irpf,r.ss];donutChart.update(mode);
-}
+    function initDonutChart() {
+      const ctx = document.getElementById('donutChart').getContext('2d');
+      donutChart = new Chart(ctx, {
+        type: 'doughnut', data: {
+          labels: ['Neto (tuyo)', 'IRPF', 'Seg. Social'],
+          datasets: [{ data: [0, 0, 0], backgroundColor: ['rgba(0,232,122,.7)', 'rgba(255,58,92,.7)', 'rgba(255,200,60,.55)'], borderColor: ['#00e87a', '#ff3a5c', '#ffc83d'], borderWidth: 2, hoverOffset: 8 }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false, cutout: '65%',
+          layout: { padding: 15 },
+          interaction: { intersect: false },
+          plugins: {
+            legend: { position: 'bottom', labels: { color: 'rgba(255,255,255,.45)', font: { size: 11, family: "'DM Mono'" }, padding: 12, boxWidth: 12 } },
+            tooltip: {
+              backgroundColor: '#0d1024', borderColor: 'rgba(255,200,60,.2)', borderWidth: 1, padding: 12,
+              callbacks: { label: i => `  ${i.label}: ${fmt(i.parsed)} (${pct(i.parsed / i.dataset.data.reduce((a, b) => a + b, 0))})` }
+            }
+          }
+        }
+      });
+    }
+    function updateDonutChart(mode = 'none') {
+      const r = calcIRPF(salary, cc); if (!r) return;
+      donutChart.data.datasets[0].data = [r.net, r.irpf, r.ss]; donutChart.update(mode);
+    }
 
-function initMarginalChart(){
-  const ctx=document.getElementById('marginalChart').getContext('2d');
-  const g=ctx.createLinearGradient(0,0,0,250);g.addColorStop(0,'rgba(160,124,248,.3)');g.addColorStop(1,'rgba(160,124,248,.02)');
-  marginalChart=new Chart(ctx,{type:'line',data:{datasets:[
-    {label:'€ netos de 100€ extra',data:[],borderColor:'#a07cf8',backgroundColor:g,borderWidth:2.5,fill:true,tension:.4,pointRadius:0},
-    {label:'Umbral 50€',data:[{x:0,y:50},{x:300000,y:50}],borderColor:'rgba(255,200,60,.4)',borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false},
-    {label:'Tu posición',data:[],type:'scatter',backgroundColor:'#fff',borderColor:'#fff',pointRadius:7}
-  ]},options:{responsive:true,maintainAspectRatio:false,
-    interaction:{intersect:false,mode:'index'},
-    plugins:{legend:{display:false},
-      tooltip:{backgroundColor:'#0d1024',borderColor:'rgba(160,124,248,.3)',borderWidth:1,padding:12,
-        callbacks:{title:i=>'Bruto: '+fmt(i[0].parsed.x),label:i=>i.datasetIndex===0?` Te quedan ${i.parsed.y.toFixed(1)}€ de 100€ extra`:null,filter:i=>i.datasetIndex===0}}},
-    scales:{x:{type:'linear',min:0,max:300000,ticks:{color:'rgba(255,255,255,.2)',font:{size:10,family:"'DM Mono'"},callback:v=>v>=1000?(v/1000)+'k':v,maxTicksLimit:8},grid:{color:'rgba(255,255,255,.04)'}},
-      y:{min:0,max:100,ticks:{color:'rgba(255,255,255,.2)',font:{size:10,family:"'DM Mono'"},callback:v=>v+'€',maxTicksLimit:6},grid:{color:'rgba(255,255,255,.04)'}}}}});
-}
-function updateMarginalChart(mode='none'){
-  const pts=[];for(let g=0;g<=300000;g+=2000){const mk=margKeep(g,cc);if(mk!==null)pts.push({x:g,y:mk*100})}
-  marginalChart.data.datasets[0].data=pts;
-  const mk=margKeep(salary,cc);
-  marginalChart.data.datasets[2].data=mk!==null?[{x:salary,y:mk*100}]:[];
-  marginalChart.update(mode);
-}
+    function initMarginalChart() {
+      const ctx = document.getElementById('marginalChart').getContext('2d');
+      const g = ctx.createLinearGradient(0, 0, 0, 250); g.addColorStop(0, 'rgba(160,124,248,.3)'); g.addColorStop(1, 'rgba(160,124,248,.02)');
+      marginalChart = new Chart(ctx, {
+        type: 'line', data: {
+          datasets: [
+            { label: '€ netos de 100€ extra', data: [], borderColor: '#a07cf8', backgroundColor: g, borderWidth: 2.5, fill: true, tension: .4, pointRadius: 0 },
+            { label: 'Umbral 50€', data: [{ x: 0, y: 50 }, { x: 300000, y: 50 }], borderColor: 'rgba(255,200,60,.4)', borderDash: [6, 4], borderWidth: 1.5, pointRadius: 0, fill: false },
+            { label: 'Tu posición', data: [], type: 'scatter', backgroundColor: '#fff', borderColor: '#fff', pointRadius: 7 }
+          ]
+        }, options: {
+          responsive: true, maintainAspectRatio: false,
+          interaction: { intersect: false, mode: 'index' },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#0d1024', borderColor: 'rgba(160,124,248,.3)', borderWidth: 1, padding: 12,
+              callbacks: { title: i => 'Bruto: ' + fmt(i[0].parsed.x), label: i => i.datasetIndex === 0 ? ` Te quedan ${i.parsed.y.toFixed(1)}€ de 100€ extra` : null, filter: i => i.datasetIndex === 0 }
+            }
+          },
+          scales: {
+            x: { type: 'linear', min: 0, max: 300000, ticks: { color: 'rgba(255,255,255,.2)', font: { size: 10, family: "'DM Mono'" }, callback: v => v >= 1000 ? (v / 1000) + 'k' : v, maxTicksLimit: 8 }, grid: { color: 'rgba(255,255,255,.04)' } },
+            y: { min: 0, max: 100, ticks: { color: 'rgba(255,255,255,.2)', font: { size: 10, family: "'DM Mono'" }, callback: v => v + '€', maxTicksLimit: 6 }, grid: { color: 'rgba(255,255,255,.04)' } }
+          }
+        }
+      });
+    }
+    function updateMarginalChart(mode = 'none') {
+      const pts = []; for (let g = 0; g <= 300000; g += 2000) { const mk = margKeep(g, cc); if (mk !== null) pts.push({ x: g, y: mk * 100 }) }
+      marginalChart.data.datasets[0].data = pts;
+      const mk = margKeep(salary, cc);
+      marginalChart.data.datasets[2].data = mk !== null ? [{ x: salary, y: mk * 100 }] : [];
+      marginalChart.update(mode);
+    }
 
-function initEffectiveChart(){
-  const ctx=document.getElementById('effectiveChart').getContext('2d');
-  const g=ctx.createLinearGradient(0,0,0,250);g.addColorStop(0,'rgba(255,58,92,.28)');g.addColorStop(1,'rgba(255,58,92,.02)');
-  effectiveChart=new Chart(ctx,{type:'line',data:{datasets:[
-    {label:'Tipo efectivo IRPF',data:[],borderColor:'#ff3a5c',backgroundColor:g,borderWidth:2.5,fill:true,tension:.4,pointRadius:0},
-    {label:'Tu posición',data:[],type:'scatter',backgroundColor:'#fff',borderColor:'#fff',pointRadius:7}
-  ]},options:{responsive:true,maintainAspectRatio:false,
-    interaction:{intersect:false,mode:'index'},
-    plugins:{legend:{display:false},
-      tooltip:{backgroundColor:'#0d1024',borderColor:'rgba(255,58,92,.3)',borderWidth:1,padding:12,
-        callbacks:{title:i=>'Bruto: '+fmt(i[0].parsed.x),label:i=>i.datasetIndex===0?` Tipo efectivo: ${i.parsed.y.toFixed(1)}%`:null,filter:i=>i.datasetIndex===0}}},
-    scales:{x:{type:'linear',min:0,max:300000,ticks:{color:'rgba(255,255,255,.2)',font:{size:10,family:"'DM Mono'"},callback:v=>v>=1000?(v/1000)+'k':v,maxTicksLimit:8},grid:{color:'rgba(255,255,255,.04)'}},
-      y:{min:0,ticks:{color:'rgba(255,255,255,.2)',font:{size:10,family:"'DM Mono'"},callback:v=>v+'%',maxTicksLimit:6},grid:{color:'rgba(255,255,255,.04)'}}}}});
-}
-function updateEffectiveChart(mode='none'){
-  const pts=[];for(let g=0;g<=300000;g+=2000){const r=calcIRPF(g,cc);if(r)pts.push({x:g,y:r.effIRPF*100})}
-  effectiveChart.data.datasets[0].data=pts;
-  const r=calcIRPF(salary,cc);
-  effectiveChart.data.datasets[1].data=r?[{x:r.gross,y:r.effIRPF*100}]:[];
-  effectiveChart.update(mode);
-}
+    function initEffectiveChart() {
+      const ctx = document.getElementById('effectiveChart').getContext('2d');
+      const g = ctx.createLinearGradient(0, 0, 0, 250); g.addColorStop(0, 'rgba(255,58,92,.28)'); g.addColorStop(1, 'rgba(255,58,92,.02)');
+      effectiveChart = new Chart(ctx, {
+        type: 'line', data: {
+          datasets: [
+            { label: 'Tipo efectivo IRPF', data: [], borderColor: '#ff3a5c', backgroundColor: g, borderWidth: 2.5, fill: true, tension: .4, pointRadius: 0 },
+            { label: 'Tu posición', data: [], type: 'scatter', backgroundColor: '#fff', borderColor: '#fff', pointRadius: 7 }
+          ]
+        }, options: {
+          responsive: true, maintainAspectRatio: false,
+          interaction: { intersect: false, mode: 'index' },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#0d1024', borderColor: 'rgba(255,58,92,.3)', borderWidth: 1, padding: 12,
+              callbacks: { title: i => 'Bruto: ' + fmt(i[0].parsed.x), label: i => i.datasetIndex === 0 ? ` Tipo efectivo: ${i.parsed.y.toFixed(1)}%` : null, filter: i => i.datasetIndex === 0 }
+            }
+          },
+          scales: {
+            x: { type: 'linear', min: 0, max: 300000, ticks: { color: 'rgba(255,255,255,.2)', font: { size: 10, family: "'DM Mono'" }, callback: v => v >= 1000 ? (v / 1000) + 'k' : v, maxTicksLimit: 8 }, grid: { color: 'rgba(255,255,255,.04)' } },
+            y: { min: 0, ticks: { color: 'rgba(255,255,255,.2)', font: { size: 10, family: "'DM Mono'" }, callback: v => v + '%', maxTicksLimit: 6 }, grid: { color: 'rgba(255,255,255,.04)' } }
+          }
+        }
+      });
+    }
+    function updateEffectiveChart(mode = 'none') {
+      const pts = []; for (let g = 0; g <= 300000; g += 2000) { const r = calcIRPF(g, cc); if (r) pts.push({ x: g, y: r.effIRPF * 100 }) }
+      effectiveChart.data.datasets[0].data = pts;
+      const r = calcIRPF(salary, cc);
+      effectiveChart.data.datasets[1].data = r ? [{ x: r.gross, y: r.effIRPF * 100 }] : [];
+      effectiveChart.update(mode);
+    }
 
-function initRankingChart(){
-  const ctx=document.getElementById('rankingChart').getContext('2d');
-  rankingChart=new Chart(ctx,{type:'bar',data:{labels:[],datasets:[{label:'Neto',data:[],backgroundColor:[],borderRadius:5,borderSkipped:false}]},
-    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
-      interaction:{intersect:false,mode:'nearest'},
-      plugins:{legend:{display:false},
-        tooltip:{backgroundColor:'#0d1024',borderColor:'rgba(255,200,60,.2)',borderWidth:1,padding:12,
-          callbacks:{label:i=>`  Neto: ${fmt(i.parsed.x)} · Tipo ef.: ${pct(i.dataset.rates[i.dataIndex])}`}}},
-      scales:{x:{ticks:{color:'rgba(255,255,255,.2)',font:{size:10,family:"'DM Mono'"},callback:v=>(v/1000)+'k€',maxTicksLimit:6},grid:{color:'rgba(255,255,255,.04)'}},
-        y:{ticks:{color:'rgba(255,255,255,.6)',font:{size:11,family:"'DM Sans'"}},grid:{display:false}}}}});
-}
-function updateRankingChart(mode='none'){
-  const all=COMMUNITIES.filter(c=>!c.foral).map(c=>({c,...calcIRPF(salary,c)})).sort((a,b)=>b.net-a.net);
-  const nets=all.map(x=>x.net),minN=Math.min(...nets),maxN=Math.max(...nets);
-  rankingChart.data.labels=all.map(x=>x.c.emoji+' '+x.c.name);
-  rankingChart.data.datasets[0].data=all.map(x=>Math.round(x.net));
-  rankingChart.data.datasets[0].rates=all.map(x=>x.effIRPF);
-  rankingChart.data.datasets[0].backgroundColor=all.map(x=>{
-    if(x.c.id===cc.id)return'rgba(255,200,60,.75)';
-    const t=(x.net-minN)/(maxN-minN||1);
-    return lerp(t);
-  });
-  rankingChart.update(mode);
-  document.getElementById('rankingSubtitle').textContent=`Para ${fmt(salary)} brutos/año · Neto anual de mayor a menor`;
-}
+    function initRankingChart() {
+      const ctx = document.getElementById('rankingChart').getContext('2d');
+      rankingChart = new Chart(ctx, {
+        type: 'bar', data: { labels: [], datasets: [{ label: 'Neto', data: [], backgroundColor: [], borderRadius: 5, borderSkipped: false }] },
+        options: {
+          indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+          interaction: { intersect: false, mode: 'nearest' },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#0d1024', borderColor: 'rgba(255,200,60,.2)', borderWidth: 1, padding: 12,
+              callbacks: { label: i => `  Neto: ${fmt(i.parsed.x)} · Tipo ef.: ${pct(i.dataset.rates[i.dataIndex])}` }
+            }
+          },
+          scales: {
+            x: { ticks: { color: 'rgba(255,255,255,.2)', font: { size: 10, family: "'DM Mono'" }, callback: v => (v / 1000) + 'k€', maxTicksLimit: 6 }, grid: { color: 'rgba(255,255,255,.04)' } },
+            y: { ticks: { color: 'rgba(255,255,255,.6)', font: { size: 11, family: "'DM Sans'" } }, grid: { display: false } }
+          }
+        }
+      });
+    }
+    function updateRankingChart(mode = 'none') {
+      const all = COMMUNITIES.filter(c => !c.foral).map(c => ({ c, ...calcIRPF(salary, c) })).sort((a, b) => b.net - a.net);
+      const nets = all.map(x => x.net), minN = Math.min(...nets), maxN = Math.max(...nets);
+      rankingChart.data.labels = all.map(x => x.c.emoji + ' ' + x.c.name);
+      rankingChart.data.datasets[0].data = all.map(x => Math.round(x.net));
+      rankingChart.data.datasets[0].rates = all.map(x => x.effIRPF);
+      rankingChart.data.datasets[0].backgroundColor = all.map(x => {
+        if (x.c.id === cc.id) return 'rgba(255,200,60,.75)';
+        const t = (x.net - minN) / (maxN - minN || 1);
+        return lerp(t);
+      });
+      rankingChart.update(mode);
+      document.getElementById('rankingSubtitle').textContent = `Para ${fmt(salary)} brutos/año · Neto anual de mayor a menor`;
+    }
 
-// ══════════════ SLIDER ══════════════
+    // ══════════════ SLIDER ══════════════
 
-function syncSlider(){
-  const v=parseInt(document.getElementById('salarySlider').value);
-  salary=v;
-  document.getElementById('salarySlider').style.setProperty('--pct',((v/300000)*100)+'%');
-  document.getElementById('salaryDisplay').textContent=v.toLocaleString('es-ES')+' €';
-  document.getElementById('salaryMonthly').textContent=`≈ ${Math.round(v/12).toLocaleString('es-ES')} € / mes · ${Math.round(v/14).toLocaleString('es-ES')} € / paga (14)`;
-  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.val)===v));
-}
+    function syncSlider() {
+      const v = parseInt(document.getElementById('salarySlider').value);
+      salary = v;
+      document.getElementById('salarySlider').style.setProperty('--pct', ((v / 300000) * 100) + '%');
+      document.getElementById('salaryDisplay').textContent = v.toLocaleString('es-ES') + ' €';
+      document.getElementById('salaryMonthly').textContent = `≈ ${Math.round(v / 12).toLocaleString('es-ES')} € / mes · ${Math.round(v / 14).toLocaleString('es-ES')} € / paga (14)`;
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.val) === v));
+    }
 
-// ══════════════ MASTER UPDATE ══════════════
+    // ══════════════ MASTER UPDATE ══════════════
 
-function updateAll(mode='none'){
-  updateStats();
-  colorizeMap();
-  updateRankPanel();
-  updateCompareTrio();
-  updateMainChart(mode);
-  updateDonutChart(mode);
-  updateMarginalChart(mode);
-  updateEffectiveChart(mode);
-  updateRankingChart(mode);
-  updateBreakdown();
-}
+    function updateAll(mode = 'none') {
+      updateStats();
+      colorizeMap();
+      updateRankPanel();
+      updateCompareTrio();
+      updateMainChart(mode);
+      updateDonutChart(mode);
+      updateMarginalChart(mode);
+      updateEffectiveChart(mode);
+      updateRankingChart(mode);
+      updateBreakdown();
+    }
 
-// ══════════════ INIT ══════════════
+    // ══════════════ INIT ══════════════
 
-document.addEventListener('DOMContentLoaded',()=>{
-  const p=new URLSearchParams(location.search);
-  if(p.get('bruto')){const v=Math.min(300000,Math.max(0,parseInt(p.get('bruto'))||35000));document.getElementById('salarySlider').value=v}
-  if(p.get('cc')){const f=COMMUNITIES.find(c=>c.id===p.get('cc')&&!c.foral);if(f)cc=f}
+    document.addEventListener('DOMContentLoaded', () => {
+      const p = new URLSearchParams(location.search);
+      if (p.get('bruto')) { const v = Math.min(300000, Math.max(0, parseInt(p.get('bruto')) || 35000)); document.getElementById('salarySlider').value = v }
+      if (p.get('cc')) { const f = COMMUNITIES.find(c => c.id === p.get('cc') && !c.foral); if (f) cc = f }
 
-  renderPills();
-  buildMap();
-  initMainChart();
-  initDonutChart();
-  initMarginalChart();
-  initEffectiveChart();
-  initRankingChart();
-  syncSlider();
-  setTimeout(()=>updateAll('default'),100);
+      renderPills();
+      buildMap();
+      initMainChart();
+      initDonutChart();
+      initMarginalChart();
+      initEffectiveChart();
+      initRankingChart();
+      syncSlider();
+      setTimeout(() => updateAll('default'), 100);
 
-  document.getElementById('salarySlider').addEventListener('input',()=>{syncSlider();updateAll()});
-  document.querySelectorAll('.preset-btn').forEach(b=>b.addEventListener('click',()=>{
-    document.getElementById('salarySlider').value=b.dataset.val;syncSlider();updateAll();
-  }));
-  ['Year','Month12','Month14'].forEach(k=>{
-    document.getElementById('tog'+k).addEventListener('click',function(){
-      dispMode=k==='Year'?'year':k==='Month12'?'month12':'month14';
-      document.querySelectorAll('.toggle-opt').forEach(b=>b.classList.remove('active'));
-      this.classList.add('active');updateAll();
+      document.getElementById('salarySlider').addEventListener('input', () => { syncSlider(); updateAll() });
+      document.querySelectorAll('.preset-btn').forEach(b => b.addEventListener('click', () => {
+        document.getElementById('salarySlider').value = b.dataset.val; syncSlider(); updateAll();
+      }));
+      ['Year', 'Month12', 'Month14'].forEach(k => {
+        document.getElementById('tog' + k).addEventListener('click', function () {
+          dispMode = k === 'Year' ? 'year' : k === 'Month12' ? 'month12' : 'month14';
+          document.querySelectorAll('.toggle-opt').forEach(b => b.classList.remove('active'));
+          this.classList.add('active'); updateAll();
+        });
+      });
     });
-  });
-});
-</script>
+  </script>
 </body>
+
 </html>
