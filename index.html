@@ -600,6 +600,7 @@ function parseSvgPath(pathD) {
   const coords = [];
   let x = 0, y = 0;
   let firstX = 0, firstY = 0;
+  let hasValidCoords = false;
   
   // Split path into commands
   const commands = pathD.match(/[a-zA-Z][^a-zA-Z]*/g) || [];
@@ -611,6 +612,8 @@ function parseSvgPath(pathD) {
     for (let i = 0; i < args.length; i += 2) {
       const dx = args[i];
       const dy = args[i + 1];
+      
+      if (isNaN(dx) || isNaN(dy)) continue;
       
       switch (type) {
         case 'm': // relative move
@@ -646,15 +649,22 @@ function parseSvgPath(pathD) {
           continue;
       }
       
+      // Skip invalid coordinates (outside SVG bounds)
+      if (x < 0 || x > SVG_WIDTH || y < 0 || y > SVG_HEIGHT) continue;
+      
       // Convert pixel to lat/lon
       const lon = SVG_GEO_BOUNDS.west + (x / SVG_WIDTH) * (SVG_GEO_BOUNDS.east - SVG_GEO_BOUNDS.west);
       const lat = SVG_GEO_BOUNDS.north - (y / SVG_HEIGHT) * (SVG_GEO_BOUNDS.north - SVG_GEO_BOUNDS.south);
       
+      // Skip invalid lat/lon
+      if (lon < -180 || lon > 180 || lat < -90 || lat > 90) continue;
+      
+      hasValidCoords = true;
       coords.push([lat, lon]);
     }
   }
   
-  return coords;
+  return hasValidCoords ? coords : [];
 }
 
 // Convert SVG pixel coordinates to Leaflet's simple CRS coordinates
@@ -733,8 +743,8 @@ function parseSvgPathToSimple(pathD, svgWidth, svgHeight) {
 function buildMap() {
   // Use geographic CRS (WGS84) - original approach
   spainMap = L.map('spainMap', {
-    center: [40.0, -4.0],
-    zoom: 5,
+    center: [40.2, -3.5],
+    zoom: 3,
     zoomControl: true,
     attributionControl: true
   });
@@ -751,11 +761,16 @@ function buildMap() {
   const northEast = [SVG_GEO_BOUNDS.north, SVG_GEO_BOUNDS.east];
   const bounds = L.latLngBounds(southWest, northEast);
   
-  // Add SVG as image overlay (this shows correctly)
+  // Add SVG as background image
   L.imageOverlay('spain.svg', bounds).addTo(spainMap);
-  spainMap.fitBounds(bounds);
   
-  // Also load the SVG paths for interactivity
+  // Set zoom and center manually instead of using fitBounds
+  spainMap.setZoom(6);
+  
+  // Create polygon layer for interactivity (on top of image)
+  geoJsonLayer = L.layerGroup().addTo(spainMap);
+  
+  // Load the SVG paths for interactivity
   fetch('spain.svg')
     .then(res => res.text())
     .then(svgText => {
@@ -763,27 +778,37 @@ function buildMap() {
       const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
       const paths = svgDoc.querySelectorAll('path');
       
-      geoJsonLayer = L.layerGroup().addTo(spainMap);
+      // Polygons are created in geoJsonLayer which was initialized outside the fetch
       
       paths.forEach(path => {
         const regionId = path.getAttribute('id');
         const regionName = path.getAttribute('title');
         const pathD = path.getAttribute('d');
         
-        if (!regionId || !REGION_CODES[regionId]) return;
+        console.log('Found path:', regionId, regionName);
+        
+        if (!regionId || !REGION_CODES[regionId]) {
+          console.log('Skipping - no matching region code for:', regionId);
+          return;
+        }
         
         const community = REGION_CODES[regionId];
         
         // Convert SVG pixel coordinates to lat/lon using geoViewBox bounds
         const coords = parseSvgPath(pathD);
         
-        if (coords.length < 3) return;
+        console.log('Coords for', regionId, ':', coords.length, 'points');
+        
+        if (coords.length < 3) {
+          console.log('Skipping - not enough coords for:', regionId);
+          return;
+        }
         
         const polygon = L.polygon(coords, {
-          fillColor: community.foral ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.1)',
-          weight: 1,
-          opacity: 0.5,
-          color: 'rgba(255,255,255,0.15)',
+          fillColor: community.foral ? 'rgba(255,255,255,0.05)' : '#ff0000',
+          weight: 2,
+          opacity: 1,
+          color: '#ffffff',
           fillOpacity: 0.5
         });
         
@@ -799,12 +824,13 @@ function buildMap() {
               updateAll();
             });
             polygon.on('mouseover', function(e) {
+              console.log('Mouse over polygon:', community.name);
               polygon.setStyle({
                 weight: 2,
                 color: 'rgba(255,255,255,0.8)',
                 fillOpacity: 0.8
               });
-              showMapTipSvg(community, cc);
+              showMapTipSvg(community, communityData);
             });
             polygon.on('mouseout', function(e) {
               colorizeMapSvg();
@@ -813,8 +839,11 @@ function buildMap() {
           }
         }
         
+        console.log('Adding polygon for:', regionId);
         polygon.addTo(geoJsonLayer);
       });
+      
+      console.log('Total polygons added:', geoJsonLayer.getLayers().length);
       
       colorizeMapSvg();
     })
@@ -860,37 +889,48 @@ function showMapTipSvg(community, cc) {
   
   const tp = document.getElementById('mapTooltip');
   tp.innerHTML = `<div class="mt-name">${community.emoji} ${community.name}</div>
+    <div class="mt-row"><span>Bruto anual</span><strong>${fmt(r.gross)}</strong></div>
     <div class="mt-row"><span>Neto anual</span><strong style="color:var(--green)">${fmt(r.net)}</strong></div>
-    <div class="mt-row"><span>IRPF</span><strong style="color:var(--red)">${fmt(r.irpf)}</strong></div>
+    <div class="mt-row"><span>IRPF</span><strong style="color:var(--red)">−${fmt(r.irpf)}</strong></div>
+    <div class="mt-row"><span>Seg. Social</span><strong style="color:var(--red)">−${fmt(r.ss)}</strong></div>
     <div class="mt-row"><span>Tipo efectivo</span><strong>${pct(r.effIRPF)}</strong></div>
     <div class="mt-row"><span>Ranking</span><strong>#${rank} de 15</strong></div>`;
   
   // Find the layer for this community
   let targetLayer = null;
   geoJsonLayer.eachLayer(function(layer) {
-    if (layer.feature?.properties?.regionId === community.id) {
+    if (layer.feature?.properties?.community?.id === community.id) {
       targetLayer = layer;
     }
   });
   
   if (!targetLayer) {
+    console.log('No layer found for:', community.id);
     tp.style.display = 'none';
     return;
   }
   
   const bounds = targetLayer.getBounds();
   const center = bounds.getCenter();
-  const mapEl = document.getElementById('spainMap');
-  const mapRect = mapEl.getBoundingClientRect();
   const point = spainMap.latLngToContainerPoint(center);
   
-  let x = point.x + 14, y = point.y - 20;
-  if (x + 200 > mapRect.width) x -= 220;
-  if (y < 0) y = 10;
+  // Position tooltip relative to the map container
+  const mapEl = document.getElementById('spainMap');
+  const mapRect = mapEl.getBoundingClientRect();
   
+  let x = point.x + 14, y = point.y - 20;
+  // Adjust if would go outside the map
+  if (x + 200 > mapRect.width) x = point.x - 220;
+  if (y < 0) y = 10;
+  if (y + 200 > mapRect.height) y = mapRect.height - 210;
+  
+  // Make sure it's positioned correctly
+  tp.style.position = 'absolute';
   tp.style.left = x + 'px';
   tp.style.top = y + 'px';
+  tp.style.zIndex = '1000';
   tp.style.display = 'block';
+  console.log('Showing tooltip for:', community.name, 'at', x, y);
 }
 
 // Keep old functions for compatibility but they'll be replaced
